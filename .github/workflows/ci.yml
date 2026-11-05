@@ -6,10 +6,31 @@ on:
   pull_request:
 
 jobs:
-  stub:
+  docs-skeleton:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: CI stub
-        run: echo "CI stub; product checks land in later tasks"
+      - name: Verify Pages skeleton files
+        run: |
+          set -euo pipefail
+          required=(
+            site/index.html
+            site/ethics.html
+            site/api-overview.html
+            site/styles.css
+            .github/workflows/pages.yml
+          )
+          for f in "${required[@]}"; do
+            test -f "$f"
+            echo "PASS exists: $f"
+          done
+          grep -q 'public-API-only' site/ethics.html
+          echo "PASS ethics page mentions public-API-only"
+          grep -q '/v1/health' site/api-overview.html
+          echo "PASS api overview lists /v1/health"
+          if grep -Eiq 'lorem ipsum|TODO: fill|FIXME|99\.9% uptime|guaranteed detection' site/*.html; then
+            echo "FAIL fabricated or placeholder copy found"
+            exit 1
+          fi
+          echo "PASS no banned placeholder/fabricated phrases"

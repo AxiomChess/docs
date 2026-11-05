@@ -1,0 +1,11 @@
+# GitHub Pages metadata for this docs site.
+# Publishing uses Actions (build_type=workflow) deploying the site/ folder.
+# See .github/workflows/pages.yml and README.md.
+title: AxiomChess Docs
+description: Product documentation for AxiomChess (ethics, API overview placeholders).
+url: https://axiomchess.github.io
+baseurl: /docs
+exclude:
+  - README.md
+  - LICENSE
+  - .github

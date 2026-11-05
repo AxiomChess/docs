@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API overview -- AxiomChess Docs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <nav aria-label="Primary">
+      <a href="ethics.html">Ethics</a>
+      <a href="api-overview.html" aria-current="page">API overview</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>API overview</h1>
+    <p>
+      Placeholder reference for the planned public HTTP API. Paths and purposes
+      match <code>PROJECT_SPEC.md</code>. Implementation lands in later roadmap
+      tasks. No live guarantees, quotas, or latency numbers are claimed here.
+    </p>
+
+    <section aria-labelledby="base-heading">
+      <h2 id="base-heading">Base path</h2>
+      <p><code>/v1</code></p>
+    </section>
+
+    <section aria-labelledby="routes-heading">
+      <h2 id="routes-heading">Planned routes</h2>
+      <table>
+        <caption>Versioned REST surface from the project specification</caption>
+        <thead>
+          <tr>
+            <th scope="col">Method</th>
+            <th scope="col">Path</th>
+            <th scope="col">Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/v1/health</code></td>
+            <td>Liveness / readiness summary</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/v1/analyze/url</code></td>
+            <td>Analyze by public game URL</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/v1/analyze/pgn</code></td>
+            <td>Analyze by PGN body</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/v1/analyze/username</code></td>
+            <td>Queue or list recent public games for username and site (paged)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/v1/analyses/{id}</code></td>
+            <td>Get analysis job or result</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/v1/sites</code></td>
+            <td>List supported sites and capabilities</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="auth-heading">
+      <h2 id="auth-heading">Auth and quotas (planning notes)</h2>
+      <ul>
+        <li>Anonymous access: low quota (exact numbers set in ops config when the API ships).</li>
+        <li>API keys: higher quotas; keys hashed at rest.</li>
+        <li>Rate-limit headers on applicable responses.</li>
+      </ul>
+      <p>
+        Suggested planning starting points from the specification are not
+        production SLAs. Measured values will be recorded only after tests run.
+      </p>
+    </section>
+
+    <section aria-labelledby="errors-heading">
+      <h2 id="errors-heading">Errors</h2>
+      <p>
+        Planned stable JSON error shape:
+        <code>code</code>, <code>message</code>, optional <code>details</code>,
+        <code>requestId</code>.
+      </p>
+    </section>
+
+    <section aria-labelledby="ethics-link-heading">
+      <h2 id="ethics-link-heading">Ethics constraints</h2>
+      <p>
+        Ingest uses official public APIs only. See
+        <a href="ethics.html">Ethics and public-API-only policy</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p><a href="index.html">Back to docs home</a></p>
+  </footer>
+</body>
+</html>

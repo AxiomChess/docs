@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ethics -- AxiomChess Docs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <nav aria-label="Primary">
+      <a href="ethics.html" aria-current="page">Ethics</a>
+      <a href="api-overview.html">API overview</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Ethics and public-API-only policy</h1>
+    <p>
+      AxiomChess analyzes finished games using engine-backed features and a
+      calibrated suspicion score with uncertainty. It is an educational analysis
+      aid, not a tribunal. Reports never output a definitive "cheater" label.
+    </p>
+
+    <section aria-labelledby="hard-rules-heading">
+      <h2 id="hard-rules-heading">Hard rules</h2>
+      <ol>
+        <li>Use only documented public endpoints and user-supplied or public PGNs.</li>
+        <li>
+          Lichess: official public API at <code>https://lichess.org</code> only.
+          Respect one-request-at-a-time guidance; after HTTP 429 wait at least one
+          minute before retry (per Lichess API tips).
+        </li>
+        <li>
+          Chess.com: Published-Data API base
+          <code>https://api.chess.com/pub/</code> only. Public read-only data;
+          no private chat, conditional moves, or authenticated-only surfaces.
+        </li>
+        <li>
+          Add another site only when a legal public route or standard public PGN
+          export is documented. If none exists, do not add an adapter.
+        </li>
+        <li>
+          No account takeover, captcha bypass, private-game access, HTML scraping
+          behind login, or rate-limit evasion.
+        </li>
+        <li>
+          Reports must present uncertainty, methodology notes, confidence bands,
+          and false-positive guidance.
+        </li>
+        <li>
+          Prefer a player's own games or clearly public games. UI and docs must
+          state limits and false-positive risk.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="non-goals-heading">
+      <h2 id="non-goals-heading">Non-goals</h2>
+      <ul>
+        <li>Live cheat detection during ongoing games</li>
+        <li>Access to private games or login-gated data</li>
+        <li>Definitive guilt labels without uncertainty</li>
+        <li>Guaranteeing legal findings for federations or platforms</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Upstream sources</h2>
+      <ul>
+        <li><a href="https://lichess.org/api">Lichess API</a></li>
+        <li><a href="https://lichess.org/page/api-tips">Lichess API tips</a></li>
+        <li>
+          <a href="https://www.chess.com/news/view/published-data-api">Chess.com Published-Data API</a>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p><a href="index.html">Back to docs home</a></p>
+  </footer>
+</body>
+</html>
