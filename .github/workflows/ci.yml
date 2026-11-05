@@ -18,6 +18,7 @@ jobs:
             site/index.html
             site/ethics.html
             site/api-overview.html
+            site/supported-sites.html
             site/styles.css
             .github/workflows/pages.yml
           )
@@ -29,6 +30,10 @@ jobs:
           echo "PASS ethics page mentions public-API-only"
           grep -q '/v1/health' site/api-overview.html
           echo "PASS api overview lists /v1/health"
+          grep -q 'lichess' site/supported-sites.html
+          grep -q 'chesscom' site/supported-sites.html
+          grep -q 'sites.manifest.json' site/supported-sites.html
+          echo "PASS supported sites lists lichess and chesscom"
           if grep -Eiq 'lorem ipsum|TODO: fill|FIXME|99\.9% uptime|guaranteed detection' site/*.html; then
             echo "FAIL fabricated or placeholder copy found"
             exit 1

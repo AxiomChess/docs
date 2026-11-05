@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supported sites -- AxiomChess Docs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <nav aria-label="Primary">
+      <a href="ethics.html">Ethics</a>
+      <a href="api-overview.html">API overview</a>
+      <a href="supported-sites.html" aria-current="page">Supported sites</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Supported sites</h1>
+    <p>
+      Snippet from the adapters package manifest
+      (<code>sites.manifest.json</code>, version 1). The live
+      <code>GET /v1/sites</code> endpoint will return this contract when the API
+      ships (roadmap T20). Public APIs only; standard chess only in v1.
+    </p>
+
+    <section aria-labelledby="sites-heading">
+      <h2 id="sites-heading">Sites</h2>
+      <table>
+        <caption>Implemented adapters and capabilities</caption>
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Display name</th>
+            <th scope="col">Official base URL</th>
+            <th scope="col">Capabilities</th>
+            <th scope="col">Auth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>lichess</code></td>
+            <td>Lichess</td>
+            <td><code>https://lichess.org</code></td>
+            <td><code>parse_url</code>, <code>fetch_game</code>, <code>list_recent_games</code></td>
+            <td><code>none</code></td>
+          </tr>
+          <tr>
+            <td><code>chesscom</code></td>
+            <td>Chess.com</td>
+            <td><code>https://api.chess.com/pub</code></td>
+            <td><code>parse_url</code>, <code>fetch_game</code>, <code>list_recent_games</code></td>
+            <td><code>none</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="notes-heading">
+      <h2 id="notes-heading">Notes</h2>
+      <ul>
+        <li>
+          Lichess: one request at a time from a worker; after HTTP 429 wait at
+          least 60 seconds. Docs:
+          <a href="https://lichess.org/api">https://lichess.org/api</a>.
+        </li>
+        <li>
+          Chess.com: Published-Data API only. PubAPI has no single-game
+          endpoint; <code>fetch_game</code> uses composite ids
+          <code>username/YYYY/MM/id</code> from <code>list_recent_games</code>.
+          Docs:
+          <a href="https://www.chess.com/news/view/published-data-api">Published-Data API</a>.
+        </li>
+        <li>
+          Allowlisted web hosts for URL ingest: <code>lichess.org</code>,
+          <code>www.lichess.org</code>, <code>chess.com</code>,
+          <code>www.chess.com</code>.
+        </li>
+        <li>Variants: <code>standard</code> only.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="ethics-link-heading">
+      <h2 id="ethics-link-heading">Ethics</h2>
+      <p>
+        See <a href="ethics.html">Ethics and public-API-only policy</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p><a href="index.html">Back to docs home</a></p>
+  </footer>
+</body>
+</html>
