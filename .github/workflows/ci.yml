@@ -29,12 +29,17 @@ jobs:
           grep -q 'public-API-only' site/ethics.html
           echo "PASS ethics page mentions public-API-only"
           grep -q '/v1/health' site/api-overview.html
-          echo "PASS api overview lists /v1/health"
+          grep -q '/v1/sites' site/api-overview.html
+          grep -q '10 / day' site/api-overview.html
+          grep -q '200 / day' site/api-overview.html
+          grep -q 'public-API-only' site/api-overview.html
+          echo "PASS api reference lists health, sites, quotas, ethics"
           grep -q 'lichess' site/supported-sites.html
           grep -q 'chesscom' site/supported-sites.html
           grep -q 'sites.manifest.json' site/supported-sites.html
+          grep -q 'GET /v1/sites' site/supported-sites.html
           echo "PASS supported sites lists lichess and chesscom"
-          if grep -Eiq 'lorem ipsum|TODO: fill|FIXME|99\.9% uptime|guaranteed detection' site/*.html; then
+          if grep -Eiq 'lorem ipsum|TODO: fill|FIXME|99\.9% uptime|guaranteed detection|placeholders until implementation' site/*.html; then
             echo "FAIL fabricated or placeholder copy found"
             exit 1
           fi

@@ -11,7 +11,7 @@
     <p class="brand"><a href="index.html">AxiomChess</a></p>
     <nav aria-label="Primary">
       <a href="ethics.html">Ethics</a>
-      <a href="api-overview.html">API overview</a>
+      <a href="api-overview.html">API reference</a>
       <a href="supported-sites.html">Supported sites</a>
     </nav>
   </header>
@@ -20,15 +20,15 @@
     <h1>Documentation</h1>
     <p>
       AxiomChess is a free and open-source chess fair-play analysis platform.
-      These pages describe product ethics, the planned public API surface, and
-      where the authoritative plan files live.
+      These pages describe product ethics, the public API reference, supported
+      sites, and where the authoritative plan files live.
     </p>
 
     <section aria-labelledby="start-heading">
       <h2 id="start-heading">Start here</h2>
       <ul>
         <li><a href="ethics.html">Ethics and public-API-only policy</a></li>
-        <li><a href="api-overview.html">API overview (placeholders until implementation)</a></li>
+        <li><a href="api-overview.html">API reference (routes, auth, quotas)</a></li>
         <li><a href="supported-sites.html">Supported sites (adapters manifest snippet)</a></li>
       </ul>
     </section>
@@ -54,9 +54,10 @@
     <section aria-labelledby="status-heading">
       <h2 id="status-heading">Status</h2>
       <p>
-        This is a documentation skeleton. Endpoint behavior, quotas, and measured
-        performance numbers appear only after the corresponding roadmap tasks ship
-        and record real values. Do not treat placeholders as live guarantees.
+        API routes, auth quotas, and site capabilities documented here match the
+        implemented <code>api</code> and <code>adapters</code> packages. Measured
+        latency or uptime SLAs are not claimed. Do not invent fields beyond the
+        OpenAPI document and these pages.
       </p>
     </section>
   </main>

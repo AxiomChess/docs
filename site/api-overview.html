@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>API overview -- AxiomChess Docs</title>
+  <title>API reference -- AxiomChess Docs</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,17 +11,18 @@
     <p class="brand"><a href="index.html">AxiomChess</a></p>
     <nav aria-label="Primary">
       <a href="ethics.html">Ethics</a>
-      <a href="api-overview.html" aria-current="page">API overview</a>
+      <a href="api-overview.html" aria-current="page">API reference</a>
       <a href="supported-sites.html">Supported sites</a>
     </nav>
   </header>
 
   <main>
-    <h1>API overview</h1>
+    <h1>API reference</h1>
     <p>
-      Placeholder reference for the planned public HTTP API. Paths and purposes
-      match <code>PROJECT_SPEC.md</code>. Implementation lands in later roadmap
-      tasks. No live guarantees, quotas, or latency numbers are claimed here.
+      Public HTTP API for fair-play analysis. Paths match
+      <code>PROJECT_SPEC.md</code>. Machine-readable OpenAPI is served at
+      <code>GET /v1/openapi.json</code> from the <code>api</code> service.
+      Education-first: responses never emit a definitive "cheater" label.
     </p>
 
     <section aria-labelledby="base-heading">
@@ -30,9 +31,9 @@
     </section>
 
     <section aria-labelledby="routes-heading">
-      <h2 id="routes-heading">Planned routes</h2>
+      <h2 id="routes-heading">Routes</h2>
       <table>
-        <caption>Versioned REST surface from the project specification</caption>
+        <caption>Versioned REST surface</caption>
         <thead>
           <tr>
             <th scope="col">Method</th>
@@ -49,7 +50,7 @@
           <tr>
             <td><code>POST</code></td>
             <td><code>/v1/analyze/url</code></td>
-            <td>Analyze by public game URL</td>
+            <td>Analyze by public game URL (SSRF allowlist)</td>
           </tr>
           <tr>
             <td><code>POST</code></td>
@@ -59,7 +60,7 @@
           <tr>
             <td><code>POST</code></td>
             <td><code>/v1/analyze/username</code></td>
-            <td>Queue or list recent public games for username and site (paged)</td>
+            <td>List recent public games for username and site (paged); optional analyze queue</td>
           </tr>
           <tr>
             <td><code>GET</code></td>
@@ -69,49 +70,109 @@
           <tr>
             <td><code>GET</code></td>
             <td><code>/v1/sites</code></td>
-            <td>List supported sites and capabilities</td>
+            <td>List supported sites and capabilities (adapters manifest)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/v1/openapi.json</code></td>
+            <td>OpenAPI 3.1 document for this API version</td>
           </tr>
         </tbody>
       </table>
     </section>
 
     <section aria-labelledby="auth-heading">
-      <h2 id="auth-heading">Auth and quotas (planning notes)</h2>
-      <ul>
-        <li>Anonymous access: low quota (exact numbers set in ops config when the API ships).</li>
-        <li>API keys: higher quotas; keys hashed at rest.</li>
-        <li>Rate-limit headers on applicable responses.</li>
-      </ul>
+      <h2 id="auth-heading">Auth and quotas</h2>
       <p>
-        Suggested planning starting points from the specification are not
-        production SLAs. Measured values will be recorded only after tests run.
+        Defaults from the <code>api</code> package <code>docs/quotas.md</code>
+        (aligned with <code>PROJECT_SPEC.md</code>):
+      </p>
+      <table>
+        <caption>Analysis quota defaults</caption>
+        <thead>
+          <tr>
+            <th scope="col">Subject</th>
+            <th scope="col">Daily analyses</th>
+            <th scope="col">Burst</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Anonymous (per client IP)</td>
+            <td>10 / day</td>
+            <td>2 / minute</td>
+          </tr>
+          <tr>
+            <td>API key</td>
+            <td>200 / day</td>
+            <td>20 / minute</td>
+          </tr>
+        </tbody>
+      </table>
+      <ul>
+        <li>
+          Send an API key with <code>Authorization: Bearer &lt;key&gt;</code> or
+          <code>X-API-Key: &lt;key&gt;</code>.
+        </li>
+        <li>Keys are hashed at rest (SHA-256 over pepper + raw key). Raw keys are never stored.</li>
+        <li>
+          Quota cost: each analysis create or completed-cache hit on
+          <code>POST /v1/analyze/*</code> consumes 1 unit. Username listing without
+          <code>analyze: true</code> does not consume analysis quota.
+        </li>
+        <li>
+          Rate-limit headers when quota is consumed:
+          <code>X-RateLimit-Limit</code>,
+          <code>X-RateLimit-Remaining</code>,
+          <code>X-RateLimit-Reset</code>;
+          <code>Retry-After</code> on <code>429</code>.
+        </li>
+        <li>
+          Public self-serve key minting is out of scope for v1; operators insert
+          key hashes via operator tooling.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="cache-heading">
+      <h2 id="cache-heading">Response cache</h2>
+      <p>
+        Identical completed analyses are reused by content hash of normalized PGN
+        plus engine policy id (<code>engine-v1</code>). Cache hit responses include
+        <code>X-Cache: HIT</code>; misses include <code>X-Cache: MISS</code>.
       </p>
     </section>
 
     <section aria-labelledby="errors-heading">
       <h2 id="errors-heading">Errors</h2>
       <p>
-        Planned stable JSON error shape:
+        Stable JSON error shape:
         <code>code</code>, <code>message</code>, optional <code>details</code>,
-        <code>requestId</code>.
+        <code>requestId</code>. Adapter and upstream failures map to shared codes
+        without leaking secrets.
       </p>
     </section>
 
     <section aria-labelledby="sites-link-heading">
       <h2 id="sites-link-heading">Supported sites</h2>
       <p>
-        Machine-readable site ids and capabilities:
-        <a href="supported-sites.html">Supported sites</a>
-        (from adapters <code>sites.manifest.json</code>).
+        <code>GET /v1/sites</code> returns the adapters
+        <code>sites.manifest.json</code> contract. Human-readable table:
+        <a href="supported-sites.html">Supported sites</a>.
       </p>
     </section>
 
     <section aria-labelledby="ethics-link-heading">
       <h2 id="ethics-link-heading">Ethics constraints</h2>
-      <p>
-        Ingest uses official public APIs only. See
-        <a href="ethics.html">Ethics and public-API-only policy</a>.
-      </p>
+      <ul>
+        <li>Official public site APIs only; no private-game access or login scraping.</li>
+        <li>URL ingest is SSRF-safe: only allowlisted hosts for supported sites.</li>
+        <li>Reports present uncertainty and methodology; never a definitive "cheater" label.</li>
+        <li>
+          Full policy:
+          <a href="ethics.html">Ethics and public-API-only policy</a>.
+        </li>
+      </ul>
     </section>
   </main>
 
