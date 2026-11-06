@@ -17,10 +17,12 @@ jobs:
           required=(
             site/index.html
             site/ethics.html
+            site/privacy.html
             site/api-overview.html
             site/supported-sites.html
             site/styles.css
             .github/workflows/pages.yml
+            scripts/scan-secrets.mjs
           )
           for f in "${required[@]}"; do
             test -f "$f"
@@ -28,12 +30,18 @@ jobs:
           done
           grep -q 'public-API-only' site/ethics.html
           echo "PASS ethics page mentions public-API-only"
+          grep -q 'Privacy notice' site/privacy.html
+          grep -q '30 days' site/privacy.html
+          grep -q 'DELETE /v1/analyses' site/privacy.html
+          grep -q 'does not sell personal data' site/privacy.html
+          echo "PASS privacy notice covers retention and erasure"
           grep -q '/v1/health' site/api-overview.html
           grep -q '/v1/sites' site/api-overview.html
+          grep -q 'DELETE' site/api-overview.html
           grep -q '10 / day' site/api-overview.html
           grep -q '200 / day' site/api-overview.html
           grep -q 'public-API-only' site/api-overview.html
-          echo "PASS api reference lists health, sites, quotas, ethics"
+          echo "PASS api reference lists health, sites, delete, quotas, ethics"
           grep -q 'lichess' site/supported-sites.html
           grep -q 'chesscom' site/supported-sites.html
           grep -q 'sites.manifest.json' site/supported-sites.html
@@ -44,3 +52,5 @@ jobs:
             exit 1
           fi
           echo "PASS no banned placeholder/fabricated phrases"
+      - name: Secret pattern scan
+        run: node scripts/scan-secrets.mjs

@@ -11,6 +11,7 @@
     <p class="brand"><a href="index.html">AxiomChess</a></p>
     <nav aria-label="Primary">
       <a href="ethics.html">Ethics</a>
+      <a href="privacy.html">Privacy</a>
       <a href="api-overview.html" aria-current="page">API reference</a>
       <a href="supported-sites.html">Supported sites</a>
     </nav>
@@ -65,7 +66,12 @@
           <tr>
             <td><code>GET</code></td>
             <td><code>/v1/analyses/{id}</code></td>
-            <td>Get analysis job or result</td>
+            <td>Get analysis job or result (404 if expired)</td>
+          </tr>
+          <tr>
+            <td><code>DELETE</code></td>
+            <td><code>/v1/analyses/{id}</code></td>
+            <td>Hard-delete analysis by id (privacy erasure)</td>
           </tr>
           <tr>
             <td><code>GET</code></td>

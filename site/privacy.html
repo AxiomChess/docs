@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy -- AxiomChess Docs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <nav aria-label="Primary">
+      <a href="ethics.html">Ethics</a>
+      <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="api-overview.html">API reference</a>
+      <a href="supported-sites.html">Supported sites</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Privacy notice</h1>
+    <p>
+      Short notice for operators and users of the AxiomChess API and related
+      services. AxiomChess does not sell personal data. This page summarizes
+      storage, retention, and erasure; it is not legal advice.
+    </p>
+
+    <section aria-labelledby="store-heading">
+      <h2 id="store-heading">What is stored</h2>
+      <ul>
+        <li>
+          Analysis inputs (submitted PGN or public game references) and analysis
+          results needed to serve <code>GET /v1/analyses/{id}</code>.
+        </li>
+        <li>
+          Optional API key metadata: key hashes only (SHA-256 with a server
+          pepper). Raw keys are never stored.
+        </li>
+        <li>
+          Structured request logs with a request id. Info-level logs use a PGN
+          content hash, not full PGN bodies.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="basis-heading">
+      <h2 id="basis-heading">Public games and user-supplied PGN</h2>
+      <p>
+        Processing covers publicly available finished games fetched through
+        documented site APIs (see the ethics page) and PGN supplied by the
+        caller. Private games are not in scope. Prefer a player's own games or
+        clearly public games.
+      </p>
+    </section>
+
+    <section aria-labelledby="retention-heading">
+      <h2 id="retention-heading">Retention and erasure</h2>
+      <ul>
+        <li>
+          Default analysis retention is <strong>30 days</strong>
+          (<code>ANALYSIS_RETENTION_DAYS</code>), configurable by the operator.
+        </li>
+        <li>
+          Expired analyses are treated as unavailable on read
+          (<code>GET /v1/analyses/{id}</code> returns 404). Operators should run
+          expiry purge to hard-delete expired rows.
+        </li>
+        <li>
+          Hard erasure by id: <code>DELETE /v1/analyses/{id}</code> (HTTP 204 on
+          success).
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="reports-heading">
+      <h2 id="reports-heading">Reports</h2>
+      <p>
+        Reports present calibrated suspicion bands with uncertainty and
+        methodology notes. They never emit a definitive "cheater" label.
+        False-positive risk remains, especially for short games or missing
+        clocks.
+      </p>
+    </section>
+
+    <section aria-labelledby="related-heading">
+      <h2 id="related-heading">Related</h2>
+      <ul>
+        <li><a href="ethics.html">Ethics and public-API-only policy</a></li>
+        <li><a href="api-overview.html">API reference</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>MIT-licensed first-party docs. English only. No fabricated metrics.</p>
+  </footer>
+</body>
+</html>
