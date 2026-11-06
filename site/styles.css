@@ -159,7 +159,7 @@ button:focus-visible {
 }
 
 .wiki-nav {
-  background: var(--ax-surface);
+  background: color-mix(in srgb, var(--ax-surface) 88%, var(--ax-surface-muted));
   border-bottom: 1px solid var(--ax-border);
   padding: 1.1rem 1rem 1.4rem;
 }
@@ -173,7 +173,7 @@ button:focus-visible {
     align-self: start;
     height: calc(100vh - 3.55rem);
     overflow: auto;
-    padding: 1.6rem 1rem 2.5rem 1.35rem;
+    padding: 1.75rem 0.95rem 2.5rem 1.15rem;
   }
 }
 
