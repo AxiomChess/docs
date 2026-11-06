@@ -4,186 +4,109 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>API reference -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
 </head>
 <body>
-  <header class="site-header">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
     <p class="brand"><a href="index.html">AxiomChess</a></p>
-    <nav aria-label="Primary">
-      <a href="ethics.html">Ethics</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="api-overview.html" aria-current="page">API reference</a>
-      <a href="supported-sites.html">Supported sites</a>
-    </nav>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
   </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html" aria-current="page">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
 
-  <main>
-    <h1>API reference</h1>
-    <p>
-      Public HTTP API for fair-play analysis. Paths match
-      <code>PROJECT_SPEC.md</code>. Machine-readable OpenAPI is served at
-      <code>GET /v1/openapi.json</code> from the <code>api</code> service.
-      Education-first: responses never emit a definitive "cheater" label.
-    </p>
+<h1>API reference</h1>
+<p class="lead">Public HTTP API for fair-play analysis. Paths match PROJECT_SPEC. Machine-readable OpenAPI is served at <code>GET /v1/openapi.json</code>. Education-first: responses never emit a definitive guilt label.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#base">Base path</a></li>
+  <li><a href="#routes">Routes</a></li>
+  <li><a href="#auth">Auth and quotas</a></li>
+  <li><a href="#cache">Response cache</a></li>
+  <li><a href="#errors">Errors</a></li>
+  <li><a href="#sites">Supported sites</a></li>
+  <li><a href="#ethics">Ethics constraints</a></li>
+</ol></div>
+<h2 id="base">Base path</h2>
+<p><code>/v1</code></p>
+<h2 id="routes">Routes</h2>
+<table>
+  <caption>Versioned REST surface</caption>
+  <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET</code></td><td><code>/v1/health</code></td><td>Liveness / readiness summary</td></tr>
+    <tr><td><code>POST</code></td><td><code>/v1/analyze/url</code></td><td>Analyze by public game URL (SSRF allowlist)</td></tr>
+    <tr><td><code>POST</code></td><td><code>/v1/analyze/pgn</code></td><td>Analyze by PGN body</td></tr>
+    <tr><td><code>POST</code></td><td><code>/v1/analyze/username</code></td><td>List recent public games; optional analyze queue</td></tr>
+    <tr><td><code>GET</code></td><td><code>/v1/analyses/{id}</code></td><td>Get analysis job or result (404 if expired)</td></tr>
+    <tr><td><code>DELETE</code></td><td><code>/v1/analyses/{id}</code></td><td>Hard-delete analysis by id (privacy erasure)</td></tr>
+    <tr><td><code>GET</code></td><td><code>/v1/sites</code></td><td>List supported sites and capabilities</td></tr>
+    <tr><td><code>GET</code></td><td><code>/v1/openapi.json</code></td><td>OpenAPI 3.1 document</td></tr>
+  </tbody>
+</table>
+<h2 id="auth">Auth and quotas</h2>
+<p>Defaults from the api package docs/quotas.md (aligned with PROJECT_SPEC):</p>
+<table>
+  <caption>Analysis quota defaults</caption>
+  <thead><tr><th>Subject</th><th>Daily analyses</th><th>Burst</th></tr></thead>
+  <tbody>
+    <tr><td>Anonymous (per client IP)</td><td>10 / day</td><td>2 / minute</td></tr>
+    <tr><td>API key</td><td>200 / day</td><td>20 / minute</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>Send an API key with <code>Authorization: Bearer &lt;key&gt;</code> or <code>X-API-Key: &lt;key&gt;</code>.</li>
+  <li>Keys are hashed at rest (SHA-256 over pepper + raw key). Raw keys are never stored.</li>
+  <li>Quota cost: each analysis create or completed-cache hit on <code>POST /v1/analyze/*</code> consumes 1 unit. Username listing without <code>analyze: true</code> does not consume analysis quota.</li>
+  <li>Rate-limit headers when quota is consumed: <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>; <code>Retry-After</code> on <code>429</code>.</li>
+  <li>Public self-serve key minting is out of scope for v1.</li>
+</ul>
+<p>Expanded detail: <a href="api-quotas.html">Auth and quotas</a>.</p>
+<h2 id="cache">Response cache</h2>
+<p>Identical completed analyses are reused by content hash of normalized PGN plus engine policy id (<code>engine-v1</code>). Cache hit responses include <code>X-Cache: HIT</code>; misses include <code>X-Cache: MISS</code>.</p>
+<h2 id="errors">Errors</h2>
+<p>Stable JSON error shape: <code>code</code>, <code>message</code>, optional <code>details</code>, <code>requestId</code>. Adapter and upstream failures map to shared codes without leaking secrets. Common adapter codes include <code>not_found</code>, <code>private_or_unavailable</code>, <code>rate_limited</code>, <code>unsupported_variant</code>, <code>upstream_error</code>.</p>
+<h2 id="sites">Supported sites</h2>
+<p><code>GET /v1/sites</code> returns the adapters <code>sites.manifest.json</code> contract. Human-readable table: <a href="supported-sites.html">Supported sites</a>.</p>
+<h2 id="ethics">Ethics constraints</h2>
+<ul>
+  <li>Official public site APIs only; no private-game access or login scraping. This is the public-API-only policy.</li>
+  <li>URL ingest is SSRF-safe: only allowlisted hosts for supported sites.</li>
+  <li>Reports present uncertainty and methodology; never a definitive guilt label.</li>
+  <li>Full policy: <a href="ethics.html">Ethics</a>.</li>
+</ul>
 
-    <section aria-labelledby="base-heading">
-      <h2 id="base-heading">Base path</h2>
-      <p><code>/v1</code></p>
-    </section>
-
-    <section aria-labelledby="routes-heading">
-      <h2 id="routes-heading">Routes</h2>
-      <table>
-        <caption>Versioned REST surface</caption>
-        <thead>
-          <tr>
-            <th scope="col">Method</th>
-            <th scope="col">Path</th>
-            <th scope="col">Purpose</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>GET</code></td>
-            <td><code>/v1/health</code></td>
-            <td>Liveness / readiness summary</td>
-          </tr>
-          <tr>
-            <td><code>POST</code></td>
-            <td><code>/v1/analyze/url</code></td>
-            <td>Analyze by public game URL (SSRF allowlist)</td>
-          </tr>
-          <tr>
-            <td><code>POST</code></td>
-            <td><code>/v1/analyze/pgn</code></td>
-            <td>Analyze by PGN body</td>
-          </tr>
-          <tr>
-            <td><code>POST</code></td>
-            <td><code>/v1/analyze/username</code></td>
-            <td>List recent public games for username and site (paged); optional analyze queue</td>
-          </tr>
-          <tr>
-            <td><code>GET</code></td>
-            <td><code>/v1/analyses/{id}</code></td>
-            <td>Get analysis job or result (404 if expired)</td>
-          </tr>
-          <tr>
-            <td><code>DELETE</code></td>
-            <td><code>/v1/analyses/{id}</code></td>
-            <td>Hard-delete analysis by id (privacy erasure)</td>
-          </tr>
-          <tr>
-            <td><code>GET</code></td>
-            <td><code>/v1/sites</code></td>
-            <td>List supported sites and capabilities (adapters manifest)</td>
-          </tr>
-          <tr>
-            <td><code>GET</code></td>
-            <td><code>/v1/openapi.json</code></td>
-            <td>OpenAPI 3.1 document for this API version</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section aria-labelledby="auth-heading">
-      <h2 id="auth-heading">Auth and quotas</h2>
-      <p>
-        Defaults from the <code>api</code> package <code>docs/quotas.md</code>
-        (aligned with <code>PROJECT_SPEC.md</code>):
-      </p>
-      <table>
-        <caption>Analysis quota defaults</caption>
-        <thead>
-          <tr>
-            <th scope="col">Subject</th>
-            <th scope="col">Daily analyses</th>
-            <th scope="col">Burst</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Anonymous (per client IP)</td>
-            <td>10 / day</td>
-            <td>2 / minute</td>
-          </tr>
-          <tr>
-            <td>API key</td>
-            <td>200 / day</td>
-            <td>20 / minute</td>
-          </tr>
-        </tbody>
-      </table>
-      <ul>
-        <li>
-          Send an API key with <code>Authorization: Bearer &lt;key&gt;</code> or
-          <code>X-API-Key: &lt;key&gt;</code>.
-        </li>
-        <li>Keys are hashed at rest (SHA-256 over pepper + raw key). Raw keys are never stored.</li>
-        <li>
-          Quota cost: each analysis create or completed-cache hit on
-          <code>POST /v1/analyze/*</code> consumes 1 unit. Username listing without
-          <code>analyze: true</code> does not consume analysis quota.
-        </li>
-        <li>
-          Rate-limit headers when quota is consumed:
-          <code>X-RateLimit-Limit</code>,
-          <code>X-RateLimit-Remaining</code>,
-          <code>X-RateLimit-Reset</code>;
-          <code>Retry-After</code> on <code>429</code>.
-        </li>
-        <li>
-          Public self-serve key minting is out of scope for v1; operators insert
-          key hashes via operator tooling.
-        </li>
-      </ul>
-    </section>
-
-    <section aria-labelledby="cache-heading">
-      <h2 id="cache-heading">Response cache</h2>
-      <p>
-        Identical completed analyses are reused by content hash of normalized PGN
-        plus engine policy id (<code>engine-v1</code>). Cache hit responses include
-        <code>X-Cache: HIT</code>; misses include <code>X-Cache: MISS</code>.
-      </p>
-    </section>
-
-    <section aria-labelledby="errors-heading">
-      <h2 id="errors-heading">Errors</h2>
-      <p>
-        Stable JSON error shape:
-        <code>code</code>, <code>message</code>, optional <code>details</code>,
-        <code>requestId</code>. Adapter and upstream failures map to shared codes
-        without leaking secrets.
-      </p>
-    </section>
-
-    <section aria-labelledby="sites-link-heading">
-      <h2 id="sites-link-heading">Supported sites</h2>
-      <p>
-        <code>GET /v1/sites</code> returns the adapters
-        <code>sites.manifest.json</code> contract. Human-readable table:
-        <a href="supported-sites.html">Supported sites</a>.
-      </p>
-    </section>
-
-    <section aria-labelledby="ethics-link-heading">
-      <h2 id="ethics-link-heading">Ethics constraints</h2>
-      <ul>
-        <li>Official public site APIs only; no private-game access or login scraping.</li>
-        <li>URL ingest is SSRF-safe: only allowlisted hosts for supported sites.</li>
-        <li>Reports present uncertainty and methodology; never a definitive "cheater" label.</li>
-        <li>
-          Full policy:
-          <a href="ethics.html">Ethics and public-API-only policy</a>.
-        </li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p><a href="index.html">Back to docs home</a></p>
+<nav class="wiki-pager" aria-label="Page"><a href="architecture.html">Previous: Architecture</a><a href="api-quotas.html">Next: Auth and quotas</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
   </footer>
 </body>
 </html>

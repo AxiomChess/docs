@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glossary -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html" aria-current="page">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Glossary</h1>
+<p class="lead">Stable terms used across the wiki, API, and UI. English only.</p>
+<table>
+  <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>AnalysisResultV1</td><td>Versioned JSON analysis result schema (<code>version: "v1"</code>)</td></tr>
+    <tr><td>Band</td><td>Ordinal label: low, elevated, high, or inconclusive</td></tr>
+    <tr><td>calibration-v1</td><td>Frozen scoring/uncertainty policy id</td></tr>
+    <tr><td>CPL</td><td>Centipawn loss relative to engine evaluation</td></tr>
+    <tr><td>engine-v1</td><td>Frozen UCI search policy (MultiPV 3, depth 18/16)</td></tr>
+    <tr><td>Half-width</td><td>Uncertainty radius around score S</td></tr>
+    <tr><td>Ink and Felt</td><td>Design direction: cool chalk surfaces, emerald felt accent</td></tr>
+    <tr><td>NormalizedGame</td><td>Adapters output contract: canonical PGN + metadata</td></tr>
+    <tr><td>opening-book-v1</td><td>CC0 opening book snapshot used to exclude theory plies</td></tr>
+    <tr><td>Public-API-only</td><td>Ingest restricted to documented public endpoints and public/user PGN</td></tr>
+    <tr><td>Usable plies</td><td>Post-book plies included in match/CPL sample</td></tr>
+  </tbody>
+</table>
+<p>Return to <a href="index.html">Wiki home</a>.</p>
+
+<nav class="wiki-pager" aria-label="Page"><a href="self-host.html">Previous: Self-host</a><span></span></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

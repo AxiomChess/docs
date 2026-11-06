@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scoring bands -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html" aria-current="page">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Scoring bands</h1>
+<p class="lead">Ordinal bands exist for UI clarity. They are not legal findings. Only four labels are allowed.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#vocab">Vocabulary</a></li>
+  <li><a href="#cuts">Frozen cut points</a></li>
+  <li><a href="#examples">Illustrative reading</a></li>
+  <li><a href="#ui">UI requirements</a></li>
+</ol></div>
+<h2 id="vocab">Vocabulary</h2>
+<table>
+  <thead><tr><th>Band</th><th>Meaning in product language</th></tr></thead>
+  <tbody>
+    <tr><td><code>low</code></td><td>Score below elevated threshold with enough usable plies and narrow enough uncertainty</td></tr>
+    <tr><td><code>elevated</code></td><td>Mid band; warrants careful human reading of features and notes</td></tr>
+    <tr><td><code>high</code></td><td>Score at or above high threshold under the same sample gates</td></tr>
+    <tr><td><code>inconclusive</code></td><td>Uncertainty too wide or usable sample too small</td></tr>
+  </tbody>
+</table>
+<p>Never emit a definitive guilt label. Never invent a fifth band name in first-party UI.</p>
+<h2 id="cuts">Frozen cut points</h2>
+<p>From PROJECT_SPEC and calibration-v1. Let S be the score in [0, 1] and H the uncertainty half-width.</p>
+<ol>
+  <li>If H &gt; 0.20 OR usablePlies &lt; 20 =&gt; <code>inconclusive</code></li>
+  <li>Else if S &lt; 0.45 =&gt; <code>low</code></li>
+  <li>Else if S &lt; 0.70 =&gt; <code>elevated</code></li>
+  <li>Else =&gt; <code>high</code></li>
+</ol>
+<div class="callout"><p>Do not move these cut points to make acceptance fixtures pass. Fix code or mark a fixture out of scope with reason. A new calibration policy id is required for intentional prior changes.</p></div>
+<h2 id="examples">Illustrative reading</h2>
+<ul>
+  <li>A short amateur game with few usable plies often returns <code>inconclusive</code> even if match rates look unusual.</li>
+  <li>A long game with clocks and moderate match rates may land <code>low</code> or <code>elevated</code> depending on S.</li>
+  <li>Missing clocks increase half-width relative to an otherwise similar clocked game.</li>
+</ul>
+<p>Acceptance fixtures A1-A5 are documented in analyzer acceptance notes; this wiki does not invent new numeric outcomes.</p>
+<h2 id="ui">UI requirements</h2>
+<ul>
+  <li>Show band, score, uncertainty, and methodology notes together.</li>
+  <li>Board replay and charts are optional companions on the report page; they must not replace uncertainty copy.</li>
+  <li>Landing marketing may show a stylized report sample; it must not claim live detection.</li>
+</ul>
+
+<nav class="wiki-pager" aria-label="Page"><a href="methodology.html">Previous: Methodology</a><a href="architecture.html">Next: Architecture</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

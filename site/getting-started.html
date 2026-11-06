@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Getting started -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html" aria-current="page">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Getting started</h1>
+<p class="lead">Use the web app for interactive analysis, or call the HTTP API from your own tooling. Both paths share the same ethics constraints and band vocabulary.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#web">Web app</a></li>
+  <li><a href="#api">API quick path</a></li>
+  <li><a href="#inputs">Accepted inputs</a></li>
+  <li><a href="#read-report">How to read a report</a></li>
+  <li><a href="#next">Next reading</a></li>
+</ol></div>
+<h2 id="web">Web app</h2>
+<ol>
+  <li>Open the AxiomChess web deployment (local <code>pnpm dev</code> in repo <code>web</code>, or your hosted URL).</li>
+  <li>Go to <code>/analyze</code>.</li>
+  <li>Choose public game URL, PGN paste, or username lookup for <code>lichess</code> / <code>chesscom</code>.</li>
+  <li>Wait for the job to complete, then open <code>/report/{id}</code>.</li>
+</ol>
+<p>Set <code>NEXT_PUBLIC_API_BASE_URL</code> to a running API. Private or unavailable games fail with a clear error; the UI does not encourage private-game access.</p>
+<h2 id="api">API quick path</h2>
+<pre><code>GET /v1/health
+# expects JSON with status, service, apiVersion
+
+POST /v1/analyze/pgn
+Content-Type: application/json
+{ "pgn": "&lt;canonical or near-canonical PGN&gt;" }
+
+GET /v1/analyses/{id}
+</code></pre>
+<p>Anonymous default quota: 10 analyses / day / IP, burst 2 / minute. Details: <a href="api-quotas.html">Auth and quotas</a>.</p>
+<p>Machine-readable contract: <code>GET /v1/openapi.json</code>.</p>
+<h2 id="inputs">Accepted inputs</h2>
+<table>
+  <thead><tr><th>Input</th><th>Behavior</th></tr></thead>
+  <tbody>
+    <tr><td>Game URL</td><td>Host must be allowlisted; adapter fetches public game; fails closed if private</td></tr>
+    <tr><td>PGN paste</td><td>Validated and normalized; no upstream site call</td></tr>
+    <tr><td>Username</td><td>Lists recent public finished games; optional analyze queue</td></tr>
+  </tbody>
+</table>
+<p>Standard chess only in v1. Unsupported variants return a clear error.</p>
+<h2 id="read-report">How to read a report</h2>
+<ul>
+  <li><strong>Band</strong> -- ordinal label from calibrated score and uncertainty gates.</li>
+  <li><strong>Score S</strong> -- continuous value in [0, 1] under policy <code>calibration-v1</code>.</li>
+  <li><strong>Uncertainty</strong> -- half-width; if too wide or sample too small, band is <code>inconclusive</code>.</li>
+  <li><strong>Features</strong> -- match rates, CPL, timing when clocks exist, book boundary.</li>
+  <li><strong>Notes</strong> -- methodology and false-positive warnings always present.</li>
+</ul>
+<p>Full formula: <a href="methodology.html">Methodology</a>. Band cut points: <a href="scoring-bands.html">Scoring bands</a>.</p>
+<h2 id="next">Next reading</h2>
+<ul>
+  <li><a href="ethics.html">Ethics and public-API-only policy</a></li>
+  <li><a href="privacy.html">Privacy notice</a></li>
+  <li><a href="api-overview.html">API reference</a></li>
+</ul>
+
+<nav class="wiki-pager" aria-label="Page"><a href="index.html">Previous: Wiki home</a><a href="limits.html">Next: Limits and non-goals</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

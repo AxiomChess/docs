@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auth and quotas -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html" aria-current="page">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Auth, quotas, rate limits, and cache</h1>
+<p class="lead">Values follow PROJECT_SPEC and api/docs/quotas.md. Operators may tighten limits in deployment; document deployed numbers in your runbook.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#quotas">Quotas</a></li>
+  <li><a href="#keys">API keys</a></li>
+  <li><a href="#headers">Rate-limit headers</a></li>
+  <li><a href="#cache">Response cache</a></li>
+  <li><a href="#backends">Limiter backends</a></li>
+</ol></div>
+<h2 id="quotas">Quotas (v1 defaults)</h2>
+<table>
+  <thead><tr><th>Subject</th><th>Daily analyses</th><th>Burst</th></tr></thead>
+  <tbody>
+    <tr><td>Anonymous (per client IP)</td><td>10 / day</td><td>2 / minute</td></tr>
+    <tr><td>API key</td><td>200 / day</td><td>20 / minute</td></tr>
+  </tbody>
+</table>
+<p>Quota cost: each analysis create or completed-cache hit on <code>POST /v1/analyze/*</code> consumes 1 unit. Username listing without <code>analyze: true</code> does not consume analysis quota.</p>
+<h2 id="keys">API keys</h2>
+<ul>
+  <li>Send <code>Authorization: Bearer &lt;key&gt;</code> or <code>X-API-Key: &lt;key&gt;</code>.</li>
+  <li>Keys are hashed at rest with SHA-256 over <code>pepper:rawKey</code> (<code>API_KEY_PEPPER</code>). Raw keys are never stored.</li>
+  <li>Invalid or revoked keys return <code>401</code> with <code>code: invalid_api_key</code>.</li>
+  <li>Public self-serve key minting is out of scope for v1; operators insert hashes via DB helpers.</li>
+</ul>
+<h2 id="headers">Rate-limit headers</h2>
+<table>
+  <thead><tr><th>Header</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>X-RateLimit-Limit</code></td><td>Binding window limit</td></tr>
+    <tr><td><code>X-RateLimit-Remaining</code></td><td>Remaining units in that window</td></tr>
+    <tr><td><code>X-RateLimit-Reset</code></td><td>Unix epoch seconds when the window resets</td></tr>
+    <tr><td><code>Retry-After</code></td><td>Present on 429; seconds to wait</td></tr>
+  </tbody>
+</table>
+<p><code>429</code> body uses stable error shape with <code>code: rate_limited</code>.</p>
+<h2 id="cache">Response cache</h2>
+<p>Identical completed analyses are reused by content hash of normalized PGN + engine policy id (<code>engine-v1</code>).</p>
+<ul>
+  <li>Lookup uses non-expired analyses rows (<code>status=completed</code>).</li>
+  <li>Cache hit: HTTP 200, header <code>X-Cache: HIT</code>, body includes existing id + result.</li>
+  <li>Cache miss: HTTP 202, header <code>X-Cache: MISS</code>, new job enqueued.</li>
+</ul>
+<h2 id="backends">Limiter backends</h2>
+<p>Redis when <code>REDIS_URL</code> is set and reachable; otherwise in-memory (single node).</p>
+
+<nav class="wiki-pager" aria-label="Page"><a href="api-overview.html">Previous: API reference</a><a href="supported-sites.html">Next: Supported sites</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

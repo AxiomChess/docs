@@ -3,69 +3,121 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AxiomChess Docs</title>
+  <title>Wiki home -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
 </head>
 <body>
-  <header class="site-header">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
     <p class="brand"><a href="index.html">AxiomChess</a></p>
-    <nav aria-label="Primary">
-      <a href="ethics.html">Ethics</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="api-overview.html">API reference</a>
-      <a href="supported-sites.html">Supported sites</a>
-    </nav>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
   </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html" aria-current="page">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
 
-  <main>
-    <h1>Documentation</h1>
-    <p>
-      AxiomChess is a free and open-source chess fair-play analysis platform.
-      These pages describe product ethics, the public API reference, supported
-      sites, and where the authoritative plan files live.
-    </p>
+<div class="wiki-hero">
+  <p class="wiki-hero-brand">AxiomChess</p>
+  <p class="wiki-hero-lead">Free and open-source chess fair-play analysis. Engine-backed reports with suspicion bands, uncertainty, and methodology notes -- never a raw accusation. This wiki is the long-form product reference for operators, integrators, and players.</p>
+  <hr class="wiki-hero-rule" aria-hidden="true">
+</div>
+<h1>Product wiki</h1>
+<p class="lead">AxiomChess analyzes <strong>finished</strong> public games or user-supplied PGN. It is an educational analysis aid, not a federation tribunal and not live cheat detection.</p>
+<div class="toc" aria-label="On this page">
+  <p>On this page</p>
+  <ol>
+    <li><a href="#what">What AxiomChess is</a></li>
+    <li><a href="#read">Where to read next</a></li>
+    <li><a href="#pipeline">Analysis pipeline (summary)</a></li>
+    <li><a href="#repos">Repositories</a></li>
+    <li><a href="#truth">Truthfulness rules for this wiki</a></li>
+  </ol>
+</div>
+<h2 id="what">What AxiomChess is</h2>
+<p>AxiomChess offers a public HTTP API, a web app, and Stockfish-backed feature extraction that produces a calibrated suspicion score with an uncertainty interval. Every result carries methodology notes and false-positive guidance.</p>
+<p>Supported ingest in v1:</p>
+<ul>
+  <li>Public game URL (Lichess or Chess.com, allowlisted hosts only)</li>
+  <li>PGN paste (no site call)</li>
+  <li>Username recent public games (paged list; optional analyze)</li>
+</ul>
+<p>Bands are only <code>low</code>, <code>elevated</code>, <code>high</code>, and <code>inconclusive</code>. The product never emits a definitive guilt label.</p>
+<div class="callout">
+  <p><strong>Public-API-only.</strong> Lichess official public API and Chess.com Published-Data API only. No private games, no login scraping, no rate-limit evasion.</p>
+</div>
+<h2 id="read">Where to read next</h2>
+<ul class="card-list">
+  <li><a href="getting-started.html">Getting started<span>Analyze a game in the web app or call the API health route</span></a></li>
+  <li><a href="ethics.html">Ethics<span>Hard rules for fair access and report integrity</span></a></li>
+  <li><a href="methodology.html">Methodology<span>engine-v1 and calibration-v1 formula, priors, uncertainty</span></a></li>
+  <li><a href="api-overview.html">API reference<span>All /v1 routes, errors, OpenAPI pointer</span></a></li>
+  <li><a href="architecture.html">Architecture<span>Multi-repo services, pipeline, storage</span></a></li>
+  <li><a href="self-host.html">Self-host<span>Local API, Postgres, optional Redis, workers</span></a></li>
+</ul>
+<h2 id="pipeline">Analysis pipeline (summary)</h2>
+<ol>
+  <li><strong>Ingest</strong> -- URL, PGN, or username via adapters; SSRF allowlist for URLs.</li>
+  <li><strong>Normalize</strong> -- canonical PGN + metadata (<code>NormalizedGame</code>).</li>
+  <li><strong>Engine eval</strong> -- Stockfish UCI, MultiPV 3, depth policy <code>engine-v1</code>.</li>
+  <li><strong>Features</strong> -- top-1/top-3 match, CPL, timing if clocks, opening-book boundary.</li>
+  <li><strong>Calibrate</strong> -- score S in [0,1], half-width, ordinal band.</li>
+  <li><strong>Output</strong> -- <code>AnalysisResultV1</code> JSON + human report.</li>
+</ol>
+<p>Full detail: <a href="methodology.html">Methodology</a> and <a href="architecture.html">Architecture</a>.</p>
+<h2 id="repos">Repositories</h2>
+<table>
+  <caption>GitHub org AxiomChess</caption>
+  <thead><tr><th>Repo</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><code>web</code></td><td>Marketing site, analyze UI, reports</td></tr>
+    <tr><td><code>api</code></td><td>Public HTTP API, quotas, jobs, Postgres</td></tr>
+    <tr><td><code>analyzer</code></td><td>Stockfish workers, features, scoring</td></tr>
+    <tr><td><code>adapters</code></td><td>Site ingest + PGN normalize + fixtures</td></tr>
+    <tr><td><code>design</code></td><td>Ink and Felt tokens and brand assets</td></tr>
+    <tr><td><code>docs</code></td><td>This wiki (GitHub Pages)</td></tr>
+    <tr><td><code>.github</code></td><td>Org templates and organization homepage profile</td></tr>
+  </tbody>
+</table>
+<p>Org homepage: <a href="https://github.com/AxiomChess">https://github.com/AxiomChess</a>. Pages URL: <a href="https://axiomchess.github.io/docs/">https://axiomchess.github.io/docs/</a>.</p>
+<h2 id="truth">Truthfulness rules for this wiki</h2>
+<ul>
+  <li>English only. No emoji.</li>
+  <li>Do not invent endpoints, fields, licenses, uptime SLAs, or detection guarantees.</li>
+  <li>When plan files and code disagree, update docs to match implemented packages after verification.</li>
+  <li>Latency or availability SLAs are not claimed on these pages.</li>
+</ul>
 
-    <section aria-labelledby="start-heading">
-      <h2 id="start-heading">Start here</h2>
-      <ul>
-        <li><a href="ethics.html">Ethics and public-API-only policy</a></li>
-        <li><a href="privacy.html">Privacy notice (retention and erasure)</a></li>
-        <li><a href="api-overview.html">API reference (routes, auth, quotas)</a></li>
-        <li><a href="supported-sites.html">Supported sites (adapters manifest snippet)</a></li>
-      </ul>
-    </section>
-
-    <section aria-labelledby="plan-heading">
-      <h2 id="plan-heading">Plan sources</h2>
-      <p>
-        Product requirements are maintained in the local plan set, not invented here:
-      </p>
-      <ul>
-        <li><code>PROJECT_SPEC.md</code> -- vision, stack, API surface, acceptance bars</li>
-        <li><code>REPOS.md</code> -- org and repository layout</li>
-        <li><code>ROADMAP.md</code> -- task sequence and acceptance checks</li>
-        <li><code>RULES.md</code> -- non-negotiable contributor rules</li>
-        <li><code>PROGRESS.md</code> -- checked task state</li>
-      </ul>
-      <p>
-        Site URL for this Pages site:
-        <a href="https://axiomchess.github.io/docs/">https://axiomchess.github.io/docs/</a>
-      </p>
-    </section>
-
-    <section aria-labelledby="status-heading">
-      <h2 id="status-heading">Status</h2>
-      <p>
-        API routes, auth quotas, and site capabilities documented here match the
-        implemented <code>api</code> and <code>adapters</code> packages. Measured
-        latency or uptime SLAs are not claimed. Do not invent fields beyond the
-        OpenAPI document and these pages.
-      </p>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p>MIT-licensed first-party docs. English only. No fabricated metrics.</p>
+<nav class="wiki-pager" aria-label="Page"><span></span><a href="getting-started.html">Next: Getting started</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
   </footer>
 </body>
 </html>

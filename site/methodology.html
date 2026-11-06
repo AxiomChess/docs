@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Methodology -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html" aria-current="page">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Methodology and calibration</h1>
+<p class="lead">Policy ids: engine policy <code>engine-v1</code> and calibration policy <code>calibration-v1</code>. This page freezes the documented formula used by the analyzer package. Do not change cut points to make fixtures pass; cut a new policy id instead.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#engine">Engine policy engine-v1</a></li>
+  <li><a href="#features">Features</a></li>
+  <li><a href="#priors">Planning prior anchors</a></li>
+  <li><a href="#score">Score formula</a></li>
+  <li><a href="#uncertainty">Uncertainty</a></li>
+  <li><a href="#bands">Band mapping</a></li>
+  <li><a href="#notes">Mandatory notes</a></li>
+  <li><a href="#false">False-positive guidance</a></li>
+</ol></div>
+<h2 id="engine">Engine policy engine-v1</h2>
+<ul>
+  <li>Engine: official Stockfish via UCI (pinned release documented in analyzer NOTICE).</li>
+  <li>MultiPV = 3.</li>
+  <li>Depth = 18 for standard time controls; Depth = 16 for bullet when that policy branch runs.</li>
+  <li>Threads and Hash are worker-sized and recorded in result metadata.</li>
+</ul>
+<p>Opening book: snapshot <code>opening-book-v1</code> from lichess-org/chess-openings (CC0). Book plies are excluded from match statistics; the novelty ply is reported.</p>
+<h2 id="features">Features</h2>
+<table>
+  <thead><tr><th>Feature</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><code>match.top1Rate</code></td><td>Primary engine-likeness signal</td></tr>
+    <tr><td><code>match.top3Rate</code></td><td>Secondary match signal</td></tr>
+    <tr><td><code>cpl.average</code></td><td>Low average CPL raises suspicion</td></tr>
+    <tr><td><code>match.usablePlies</code></td><td>Sample size for uncertainty and inconclusive gate</td></tr>
+    <tr><td><code>timing.fastHighMatchStreakMax</code></td><td>Optional boost when clocks exist</td></tr>
+    <tr><td>timing null vs present</td><td>Widens uncertainty when clocks are missing</td></tr>
+  </tbody>
+</table>
+<h2 id="priors">Planning prior anchors</h2>
+<p>These are planning priors for reproducibility. They are not claimed as empirical population estimates from a labeled corpus.</p>
+<table>
+  <thead><tr><th>Anchor</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>PRIOR_TOP1</code></td><td>0.42</td></tr>
+    <tr><td><code>PRIOR_TOP3</code></td><td>0.68</td></tr>
+    <tr><td><code>CPL_SOFT_CAP</code></td><td>200</td></tr>
+    <tr><td><code>TIMING_STREAK_CAP</code></td><td>12</td></tr>
+    <tr><td><code>TIMING_BOOST_MAX</code></td><td>0.12</td></tr>
+    <tr><td><code>UNCERTAINTY_K</code></td><td>0.75</td></tr>
+    <tr><td><code>MISSING_CLOCK_EXTRA_HW</code></td><td>0.05</td></tr>
+  </tbody>
+</table>
+<h2 id="score">Score formula</h2>
+<p>All arithmetic is IEEE-754 float64. Clamp x to [0, 1].</p>
+<ol>
+  <li><code>cplSignal = 1 - clamp(cpl.average / CPL_SOFT_CAP, 0, 1)</code></li>
+  <li><code>matchSignal = 0.55 * top1Rate + 0.20 * top3Rate + 0.25 * cplSignal</code></li>
+  <li>If timing present: <code>timingBoost = TIMING_BOOST_MAX * clamp(fastHighMatchStreakMax / TIMING_STREAK_CAP, 0, 1)</code>; else 0.</li>
+  <li><code>S = clamp(matchSignal + timingBoost, 0, 1)</code></li>
+</ol>
+<p>PRIOR_TOP1 / PRIOR_TOP3 are design anchors; the v1 blend uses raw rates directly so the score stays monotone in match rates.</p>
+<h2 id="uncertainty">Uncertainty</h2>
+<ol>
+  <li>If usablePlies &lt;= 0: halfWidth = 0.5, interval [0, 1].</li>
+  <li>Else baseHw = UNCERTAINTY_K / sqrt(usablePlies); halfWidth = min(0.5, baseHw + (timing ? 0 : MISSING_CLOCK_EXTRA_HW)).</li>
+  <li>Interval: low = max(0, S - halfWidth), high = min(1, S + halfWidth).</li>
+</ol>
+<h2 id="bands">Band mapping</h2>
+<p>See <a href="scoring-bands.html">Scoring bands</a> for the frozen cut points (0.45 / 0.70 / half-width 0.20 / usable plies 20).</p>
+<h2 id="notes">Mandatory notes</h2>
+<p>Every result includes methodology identity (policy ids), false-positive warning, and sample-size caveats (short games, missing clocks, book length).</p>
+<h2 id="false">False-positive guidance</h2>
+<ul>
+  <li>Strong players can match engine lines without assistance.</li>
+  <li>Prepared openings inflate early match rates; book exclusion mitigates but does not eliminate theory effects.</li>
+  <li>Missing clocks remove timing evidence and widen uncertainty.</li>
+  <li>Short games often land in <code>inconclusive</code> by design.</li>
+</ul>
+<p>Authoritative freeze text also lives in <code>analyzer/docs/calibration-v1.md</code>.</p>
+
+<nav class="wiki-pager" aria-label="Page"><a href="privacy.html">Previous: Privacy</a><a href="scoring-bands.html">Next: Scoring bands</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

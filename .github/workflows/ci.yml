@@ -16,13 +16,22 @@ jobs:
           set -euo pipefail
           required=(
             site/index.html
+            site/getting-started.html
+            site/limits.html
             site/ethics.html
             site/privacy.html
+            site/methodology.html
+            site/scoring-bands.html
+            site/architecture.html
             site/api-overview.html
+            site/api-quotas.html
             site/supported-sites.html
+            site/self-host.html
+            site/glossary.html
             site/styles.css
             .github/workflows/pages.yml
             scripts/scan-secrets.mjs
+            scripts/build-wiki-pages.mjs
           )
           for f in "${required[@]}"; do
             test -f "$f"

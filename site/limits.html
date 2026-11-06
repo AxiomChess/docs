@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Limits and non-goals -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html" aria-current="page">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Limits and non-goals</h1>
+<p class="lead">AxiomChess is intentionally narrow. This page lists what the product will not do in v1, so operators and users do not expect tribunal-grade findings.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#non-goals">Non-goals</a></li>
+  <li><a href="#sample">Sample-size and data limits</a></li>
+  <li><a href="#legal">Legal and federation posture</a></li>
+  <li><a href="#claims">Claims this wiki will not make</a></li>
+</ol></div>
+<h2 id="non-goals">Non-goals</h2>
+<ul>
+  <li>Live cheat detection during ongoing games.</li>
+  <li>Account takeover, credential stuffing, captcha bypass, or any private-game access.</li>
+  <li>Scraping HTML behind login, circumventing rate limits, or violating site Terms of Service.</li>
+  <li>Definitive guilt labels without uncertainty and methodology.</li>
+  <li>Closed-source engine forks or undistributable nets.</li>
+  <li>Social features as a primary product (comments, reputation scores, public shaming feeds).</li>
+  <li>Guaranteeing legal findings for federations or platforms.</li>
+</ul>
+<h2 id="sample">Sample-size and data limits</h2>
+<p>Reports become <code>inconclusive</code> when uncertainty half-width is greater than 0.20 or usable plies after book exclusion are fewer than 20. Missing clocks widen uncertainty relative to a clocked peer of similar length. Book-heavy openings reduce usable sample size by design.</p>
+<h2 id="legal">Legal and federation posture</h2>
+<p>AxiomChess is an educational analysis aid. It does not replace human investigation, site fair-play teams, or arbitration processes. Prefer analyzing a player's own games or clearly public games.</p>
+<h2 id="claims">Claims this wiki will not make</h2>
+<ul>
+  <li>No guaranteed detection rates.</li>
+  <li>No invented uptime percentages.</li>
+  <li>No fabricated latency SLAs on these pages.</li>
+  <li>No third-party license text invented without upstream verification.</li>
+</ul>
+
+<nav class="wiki-pager" aria-label="Page"><a href="getting-started.html">Previous: Getting started</a><a href="ethics.html">Next: Ethics</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

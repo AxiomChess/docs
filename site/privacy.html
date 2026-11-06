@@ -4,95 +4,81 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
 </head>
 <body>
-  <header class="site-header">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
     <p class="brand"><a href="index.html">AxiomChess</a></p>
-    <nav aria-label="Primary">
-      <a href="ethics.html">Ethics</a>
-      <a href="privacy.html" aria-current="page">Privacy</a>
-      <a href="api-overview.html">API reference</a>
-      <a href="supported-sites.html">Supported sites</a>
-    </nav>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
   </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html" aria-current="page">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
 
-  <main>
-    <h1>Privacy notice</h1>
-    <p>
-      Short notice for operators and users of the AxiomChess API and related
-      services. AxiomChess does not sell personal data. This page summarizes
-      storage, retention, and erasure; it is not legal advice.
-    </p>
+<h1>Privacy notice</h1>
+<p class="lead">AxiomChess stores only what is needed to run analysis jobs and honor retention and erasure. The product does not sell personal data.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#what">What is stored</a></li>
+  <li><a href="#retention">Retention</a></li>
+  <li><a href="#erasure">Erasure</a></li>
+  <li><a href="#keys">API keys</a></li>
+  <li><a href="#logs">Logs</a></li>
+  <li><a href="#basis">Processing basis (planning)</a></li>
+</ol></div>
+<h2 id="what">What is stored</h2>
+<ul>
+  <li>Analysis inputs and results (including normalized PGN while retained).</li>
+  <li>Optional API key metadata (hashed secrets only).</li>
+  <li>Request logs with request identifiers; IP retention is limited by operator configuration.</li>
+</ul>
+<p>Do not invent additional personal data categories in integrations without documenting them here.</p>
+<h2 id="retention">Retention</h2>
+<p>Default retention for analyses is <strong>30 days</strong> (<code>ANALYSIS_RETENTION_DAYS</code>). Operators may configure a different TTL; document the deployed value in your ops runbook. Expired analyses are not returned by <code>GET /v1/analyses/{id}</code> (404).</p>
+<h2 id="erasure">Erasure</h2>
+<p>Clients and operators can hard-delete an analysis with:</p>
+<pre><code>DELETE /v1/analyses/{id}
+</code></pre>
+<p>Successful erasure responds with HTTP 204. After deletion, GET returns 404.</p>
+<h2 id="keys">API keys</h2>
+<p>Keys are hashed at rest with SHA-256 over <code>pepper:rawKey</code>. Raw keys are never stored. Invalid or revoked keys return 401 with <code>code: invalid_api_key</code>. Public self-serve key minting is out of scope for v1.</p>
+<h2 id="logs">Logs</h2>
+<p>Structured logs use <code>requestId</code>. Info-level logs use PGN content hashes rather than raw PGN bodies by default. Do not log secrets.</p>
+<h2 id="basis">Processing basis (planning)</h2>
+<p>Legal basis for public game analysis is processing of publicly available game data and user-supplied PGN, with minimization and erasure of stored analyses by id. This notice is not legal advice; operators should review their jurisdiction.</p>
+<p class="callout"><strong>Summary:</strong> AxiomChess does not sell personal data. Retention defaults to 30 days. Erasure is available via <code>DELETE /v1/analyses/{id}</code>.</p>
 
-    <section aria-labelledby="store-heading">
-      <h2 id="store-heading">What is stored</h2>
-      <ul>
-        <li>
-          Analysis inputs (submitted PGN or public game references) and analysis
-          results needed to serve <code>GET /v1/analyses/{id}</code>.
-        </li>
-        <li>
-          Optional API key metadata: key hashes only (SHA-256 with a server
-          pepper). Raw keys are never stored.
-        </li>
-        <li>
-          Structured request logs with a request id. Info-level logs use a PGN
-          content hash, not full PGN bodies.
-        </li>
-      </ul>
-    </section>
-
-    <section aria-labelledby="basis-heading">
-      <h2 id="basis-heading">Public games and user-supplied PGN</h2>
-      <p>
-        Processing covers publicly available finished games fetched through
-        documented site APIs (see the ethics page) and PGN supplied by the
-        caller. Private games are not in scope. Prefer a player's own games or
-        clearly public games.
-      </p>
-    </section>
-
-    <section aria-labelledby="retention-heading">
-      <h2 id="retention-heading">Retention and erasure</h2>
-      <ul>
-        <li>
-          Default analysis retention is <strong>30 days</strong>
-          (<code>ANALYSIS_RETENTION_DAYS</code>), configurable by the operator.
-        </li>
-        <li>
-          Expired analyses are treated as unavailable on read
-          (<code>GET /v1/analyses/{id}</code> returns 404). Operators should run
-          expiry purge to hard-delete expired rows.
-        </li>
-        <li>
-          Hard erasure by id: <code>DELETE /v1/analyses/{id}</code> (HTTP 204 on
-          success).
-        </li>
-      </ul>
-    </section>
-
-    <section aria-labelledby="reports-heading">
-      <h2 id="reports-heading">Reports</h2>
-      <p>
-        Reports present calibrated suspicion bands with uncertainty and
-        methodology notes. They never emit a definitive "cheater" label.
-        False-positive risk remains, especially for short games or missing
-        clocks.
-      </p>
-    </section>
-
-    <section aria-labelledby="related-heading">
-      <h2 id="related-heading">Related</h2>
-      <ul>
-        <li><a href="ethics.html">Ethics and public-API-only policy</a></li>
-        <li><a href="api-overview.html">API reference</a></li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p>MIT-licensed first-party docs. English only. No fabricated metrics.</p>
+<nav class="wiki-pager" aria-label="Page"><a href="ethics.html">Previous: Ethics</a><a href="methodology.html">Next: Methodology</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
   </footer>
 </body>
 </html>

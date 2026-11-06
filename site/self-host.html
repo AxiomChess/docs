@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Self-host -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html" aria-current="page">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Self-host</h1>
+<p class="lead">Run the API and workers locally or on your own infrastructure. Sibling checkouts of adapters and analyzer are required for the api package path dependencies.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#prereq">Prerequisites</a></li>
+  <li><a href="#api">API</a></li>
+  <li><a href="#engine">Stockfish</a></li>
+  <li><a href="#web">Web</a></li>
+  <li><a href="#env">Environment notes</a></li>
+</ol></div>
+<h2 id="prereq">Prerequisites</h2>
+<ul>
+  <li>Node.js 20+ (CI commonly uses 22)</li>
+  <li>pnpm 10+</li>
+  <li>PostgreSQL 16 (or compatible) for persistent analyses</li>
+  <li>Optional Redis for shared rate limits / queue</li>
+</ul>
+<h2 id="api">API</h2>
+<pre><code>cd api
+pnpm install
+cp .env.example .env
+# set DATABASE_URL, and API_KEY_PEPPER for key hashing
+pnpm build
+pnpm migrate
+pnpm start
+</code></pre>
+<p>Health check: <code>GET /v1/health</code> should return JSON with <code>status</code>, <code>service</code>, and <code>apiVersion</code>.</p>
+<h2 id="engine">Stockfish</h2>
+<pre><code>cd analyzer
+pnpm install
+pnpm engine:download
+</code></pre>
+<p>Binary is not committed. License is GPL v3; keep NOTICE and source pointer. Optional: <code>AXIOMCHESS_STOCKFISH_PATH</code>.</p>
+<h2 id="web">Web</h2>
+<pre><code>cd web
+pnpm install
+pnpm tokens:sync
+# set NEXT_PUBLIC_API_BASE_URL to the API origin
+pnpm dev
+</code></pre>
+<h2 id="env">Environment notes</h2>
+<ul>
+  <li>Never commit <code>.env</code> or real secrets. Use <code>.env.example</code> placeholders only.</li>
+  <li><code>ANALYSIS_RETENTION_DAYS</code> defaults to 30.</li>
+  <li><code>REDIS_URL</code> enables Redis-backed limiters when reachable.</li>
+  <li>URL ingest rejects non-allowlisted hosts (SSRF gate).</li>
+</ul>
+<p>Also read <a href="privacy.html">Privacy</a> and <a href="api-quotas.html">Auth and quotas</a>.</p>
+
+<nav class="wiki-pager" aria-label="Page"><a href="supported-sites.html">Previous: Supported sites</a><a href="glossary.html">Next: Glossary</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>

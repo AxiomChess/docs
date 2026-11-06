@@ -4,84 +4,98 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ethics -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
 </head>
 <body>
-  <header class="site-header">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
     <p class="brand"><a href="index.html">AxiomChess</a></p>
-    <nav aria-label="Primary">
-      <a href="ethics.html" aria-current="page">Ethics</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="api-overview.html">API reference</a>
-      <a href="supported-sites.html">Supported sites</a>
-    </nav>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
   </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html" aria-current="page">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
 
-  <main>
-    <h1>Ethics and public-API-only policy</h1>
-    <p>
-      AxiomChess analyzes finished games using engine-backed features and a
-      calibrated suspicion score with uncertainty. It is an educational analysis
-      aid, not a tribunal. Reports never output a definitive "cheater" label.
-    </p>
+<h1>Ethics and public-API-only policy</h1>
+<p class="lead">AxiomChess analyzes finished games using engine-backed features and a calibrated suspicion score with uncertainty. It is an educational analysis aid, not a tribunal. Reports never output a definitive guilt label.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#hard">Hard rules</a></li>
+  <li><a href="#lichess">Lichess</a></li>
+  <li><a href="#chesscom">Chess.com</a></li>
+  <li><a href="#reports">Report integrity</a></li>
+  <li><a href="#ui">UI and copy requirements</a></li>
+  <li><a href="#extension">Adding another site</a></li>
+</ol></div>
+<h2 id="hard">Hard rules</h2>
+<ol>
+  <li>Use only documented public endpoints and user-supplied or public PGNs.</li>
+  <li>Lichess: official public API at <code>https://lichess.org</code> only. Respect one-request-at-a-time guidance; after HTTP 429 wait at least one minute before retry (per Lichess API tips).</li>
+  <li>Chess.com: Published-Data API base <code>https://api.chess.com/pub/</code> only. Public read-only data; no private chat, conditional moves, or authenticated-only surfaces.</li>
+  <li>Include another site only when a legal public route or standard public PGN export is documented. If none exists, do not add an adapter.</li>
+  <li>No account takeover, no captcha bypass, no private game access, no ToS evasion.</li>
+  <li>Reports must present uncertainty. Never output a definitive guilt label without a clear confidence band and methodology note.</li>
+  <li>Prefer analyzing a player's own games or clearly public games. UI copy must state limits and false-positive risk.</li>
+</ol>
+<div class="callout">
+  <p>These rules are non-negotiable for first-party code and for documentation examples. Demo scripts must not teach private-game scraping.</p>
+</div>
+<h2 id="lichess">Lichess</h2>
+<p>Official docs: <a href="https://lichess.org/api">https://lichess.org/api</a>. Tips: <a href="https://lichess.org/page/api-tips">https://lichess.org/page/api-tips</a>.</p>
+<ul>
+  <li>Export user games and single-game export endpoints as documented in the official OpenAPI.</li>
+  <li>Throttle: one request at a time from a worker; on 429 wait at least 60 seconds before retry.</li>
+  <li>CI and unit tests use recorded fixtures; no live network required for green builds.</li>
+</ul>
+<h2 id="chesscom">Chess.com</h2>
+<p>Published-Data API announcement and docs govern the base <code>https://api.chess.com/pub/</code>. Archives list, monthly games JSON, and monthly PGN paths are used as documented. PubAPI has no single-game endpoint; AxiomChess composite ids use <code>username/YYYY/MM/id</code> from list results.</p>
+<h2 id="reports">Report integrity</h2>
+<ul>
+  <li>Bands only: <code>low</code>, <code>elevated</code>, <code>high</code>, <code>inconclusive</code>.</li>
+  <li>Always attach methodology note, policy id, false-positive warning, and sample-size caveats.</li>
+  <li>Do not change calibration cut points to make fixtures pass; cut a new policy version instead.</li>
+</ul>
+<p>See <a href="methodology.html">Methodology</a> and <a href="scoring-bands.html">Scoring bands</a>.</p>
+<h2 id="ui">UI and copy requirements</h2>
+<ul>
+  <li>English only. No emoji.</li>
+  <li>Clear errors for <code>private_or_unavailable</code> and <code>rate_limited</code>.</li>
+  <li>No copy that encourages private-game access.</li>
+  <li>Landing and report surfaces must keep brand-first, anti-slop visual rules from the design system.</li>
+</ul>
+<h2 id="extension">Adding another site</h2>
+<p>Implement <code>SiteAdapter</code> with fixtures, allowlisted hosts, and documented public access only. Register in the adapters manifest consumed by <code>GET /v1/sites</code>. If a site has no legal public route, do not ship an adapter.</p>
 
-    <section aria-labelledby="hard-rules-heading">
-      <h2 id="hard-rules-heading">Hard rules</h2>
-      <ol>
-        <li>Use only documented public endpoints and user-supplied or public PGNs.</li>
-        <li>
-          Lichess: official public API at <code>https://lichess.org</code> only.
-          Respect one-request-at-a-time guidance; after HTTP 429 wait at least one
-          minute before retry (per Lichess API tips).
-        </li>
-        <li>
-          Chess.com: Published-Data API base
-          <code>https://api.chess.com/pub/</code> only. Public read-only data;
-          no private chat, conditional moves, or authenticated-only surfaces.
-        </li>
-        <li>
-          Add another site only when a legal public route or standard public PGN
-          export is documented. If none exists, do not add an adapter.
-        </li>
-        <li>
-          No account takeover, captcha bypass, private-game access, HTML scraping
-          behind login, or rate-limit evasion.
-        </li>
-        <li>
-          Reports must present uncertainty, methodology notes, confidence bands,
-          and false-positive guidance.
-        </li>
-        <li>
-          Prefer a player's own games or clearly public games. UI and docs must
-          state limits and false-positive risk.
-        </li>
-      </ol>
-    </section>
-
-    <section aria-labelledby="non-goals-heading">
-      <h2 id="non-goals-heading">Non-goals</h2>
-      <ul>
-        <li>Live cheat detection during ongoing games</li>
-        <li>Access to private games or login-gated data</li>
-        <li>Definitive guilt labels without uncertainty</li>
-        <li>Guaranteeing legal findings for federations or platforms</li>
-      </ul>
-    </section>
-
-    <section aria-labelledby="sources-heading">
-      <h2 id="sources-heading">Upstream sources</h2>
-      <ul>
-        <li><a href="https://lichess.org/api">Lichess API</a></li>
-        <li><a href="https://lichess.org/page/api-tips">Lichess API tips</a></li>
-        <li>
-          <a href="https://www.chess.com/news/view/published-data-api">Chess.com Published-Data API</a>
-        </li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p><a href="index.html">Back to docs home</a></p>
+<nav class="wiki-pager" aria-label="Page"><a href="limits.html">Previous: Limits and non-goals</a><a href="privacy.html">Next: Privacy</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
   </footer>
 </body>
 </html>

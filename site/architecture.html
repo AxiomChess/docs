@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture -- AxiomChess Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="wiki-top">
+    <p class="brand"><a href="index.html">AxiomChess</a></p>
+    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+  </header>
+  <div class="wiki-shell">
+    <nav class="wiki-nav" aria-label="Wiki">
+<div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
+<li><a href="index.html">Wiki home</a></li>
+<li><a href="getting-started.html">Getting started</a></li>
+<li><a href="limits.html">Limits and non-goals</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Product</p><ul>
+<li><a href="ethics.html">Ethics</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+<li><a href="scoring-bands.html">Scoring bands</a></li>
+<li><a href="architecture.html" aria-current="page">Architecture</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">API and sites</p><ul>
+<li><a href="api-overview.html">API reference</a></li>
+<li><a href="api-quotas.html">Auth and quotas</a></li>
+<li><a href="supported-sites.html">Supported sites</a></li>
+<li><a href="self-host.html">Self-host</a></li>
+</ul></div>
+<div class="wiki-nav-group"><p class="wiki-nav-label">Reference</p><ul>
+<li><a href="glossary.html">Glossary</a></li>
+</ul></div>
+    </nav>
+    <main id="main-content" class="wiki-main" tabindex="-1">
+
+<h1>Architecture</h1>
+<p class="lead">AxiomChess is a multi-repo product. Each GitHub repository maps 1:1 to a local folder under the org umbrella.</p>
+<div class="toc"><p>On this page</p><ol>
+  <li><a href="#diagram">Logical services</a></li>
+  <li><a href="#pipeline">Pipeline detail</a></li>
+  <li><a href="#stack">Stack</a></li>
+  <li><a href="#data">Data stores</a></li>
+  <li><a href="#obs">Observability</a></li>
+</ol></div>
+<h2 id="diagram">Logical services</h2>
+<pre><code>[Client / Integrator]
+        |
+        v
+   +---------+       +-----------+       +-----------+
+   |   web   | ----> |    api    | ----> | analyzer  |
+   +---------+       +-----------+       | (workers) |
+                         |               +-----------+
+                         |                     |
+                         v                     v
+                    Postgres              Stockfish
+                    (analyses)            (UCI process)
+                         |
+                    Redis (optional queue / rate cache)
+                         |
+                    adapters (ingest + PGN normalize)
+</code></pre>
+<table>
+  <thead><tr><th>Component</th><th>Repo</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>Public HTTP API</td><td><code>api</code></td><td>Versioned REST, auth quotas, caching, job orchestration</td></tr>
+    <tr><td>Web app</td><td><code>web</code></td><td>Marketing + analyze UX + report pages</td></tr>
+    <tr><td>Analyzer</td><td><code>analyzer</code></td><td>Engine workers, feature extraction, calibrated scoring</td></tr>
+    <tr><td>Site adapters</td><td><code>adapters</code></td><td>Per-site fetch + PGN normalize + fixtures</td></tr>
+    <tr><td>Design system</td><td><code>design</code></td><td>Tokens, board theme, brand assets</td></tr>
+    <tr><td>Docs</td><td><code>docs</code></td><td>This wiki on GitHub Pages</td></tr>
+  </tbody>
+</table>
+<h2 id="pipeline">Pipeline detail</h2>
+<ol>
+  <li>Ingest URL | ID | username | PGN</li>
+  <li>Normalize to canonical PGN + metadata</li>
+  <li>Engine eval (MultiPV, depth policy)</li>
+  <li>Features (match, CPL, timing if available, opening novelty)</li>
+  <li>Calibrated score + explanation</li>
+  <li>JSON result + human report</li>
+</ol>
+<h2 id="stack">Stack</h2>
+<ul>
+  <li>TypeScript throughout</li>
+  <li>API: Hono + <code>@hono/node-server</code> on Node 20+</li>
+  <li>Web: Next.js App Router + React + Tailwind</li>
+  <li>Engine: official Stockfish (GPL) as external UCI process</li>
+  <li>DB: PostgreSQL</li>
+  <li>Queue/cache: Redis optional; single-node in-memory fallback</li>
+  <li>Package manager: pnpm per repo</li>
+</ul>
+<h2 id="data">Data stores</h2>
+<p>Postgres holds analyses, API key hashes, and schema migrations. Retention purge removes expired rows. Redis, when configured, backs rate limits and optional job queue depth.</p>
+<h2 id="obs">Observability</h2>
+<p>Structured JSON logs and in-process metrics (request counts, queue depth, engine durations, cache hit/miss, upstream 429). requestId on the HTTP path. Info logs prefer PGN content hashes over raw PGN.</p>
+
+<nav class="wiki-pager" aria-label="Page"><a href="scoring-bands.html">Previous: Scoring bands</a><a href="api-overview.html">Next: API reference</a></nav>
+    </main>
+  </div>
+  <footer class="wiki-footer">
+    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+  </footer>
+</body>
+</html>
