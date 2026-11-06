@@ -4,19 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Architecture -- AxiomChess Docs</title>
+  <meta name="description" content="AxiomChess product wiki: calibrated fair-play analysis for finished games. English only.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="wiki-top">
-    <p class="brand"><a href="index.html">AxiomChess</a></p>
-    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+    <p class="brand">
+      <a href="index.html" aria-label="AxiomChess wiki home">
+        <img src="logo.svg" width="24" height="24" alt="">
+        AxiomChess
+      </a>
+    </p>
+    <ul class="wiki-top-links" aria-label="Quick links">
+      <li><a href="getting-started.html">Start</a></li>
+      <li><a href="api-overview.html">API</a></li>
+      <li><a href="methodology.html">Methodology</a></li>
+      <li><a href="https://github.com/AxiomChess">GitHub</a></li>
+    </ul>
   </header>
-  <div class="wiki-shell">
+  <div class="wiki-frame">
     <nav class="wiki-nav" aria-label="Wiki">
 <div class="wiki-nav-group"><p class="wiki-nav-label">Start</p><ul>
 <li><a href="index.html">Wiki home</a></li>
@@ -40,7 +51,8 @@
 <li><a href="glossary.html">Glossary</a></li>
 </ul></div>
     </nav>
-    <main id="main-content" class="wiki-main" tabindex="-1">
+    <div class="wiki-content">
+      <main id="main-content" class="wiki-main" tabindex="-1">
 
 <h1>Architecture</h1>
 <p class="lead">AxiomChess is a multi-repo product. Each GitHub repository maps 1:1 to a local folder under the org umbrella.</p>
@@ -104,10 +116,14 @@
 <p>Structured JSON logs and in-process metrics (request counts, queue depth, engine durations, cache hit/miss, upstream 429). requestId on the HTTP path. Info logs prefer PGN content hashes over raw PGN.</p>
 
 <nav class="wiki-pager" aria-label="Page"><a href="scoring-bands.html">Previous: Scoring bands</a><a href="api-overview.html">Next: API reference</a></nav>
-    </main>
+      </main>
+    </div>
   </div>
   <footer class="wiki-footer">
-    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+    <div class="wiki-footer-inner">
+      <p>MIT first-party docs. Finished games only. Public-API-only. English only.</p>
+      <p><a href="index.html">Wiki home</a> · <a href="https://github.com/AxiomChess">GitHub org</a></p>
+    </div>
   </footer>
 </body>
 </html>

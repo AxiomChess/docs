@@ -1,5 +1,5 @@
 /*
-  AxiomChess docs wiki -- Ink and Felt
+  AxiomChess docs wiki -- Ink and Felt (editorial)
 */
 
 :root {
@@ -7,9 +7,9 @@
   --ax-font-display: "Syne", "Segoe UI", "Helvetica Neue", sans-serif;
   --ax-font-body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", sans-serif;
   --ax-font-mono: "IBM Plex Mono", Consolas, Menlo, monospace;
-  --ax-bg: #f2f4f3;
+  --ax-bg: #eef1ef;
   --ax-surface: #ffffff;
-  --ax-surface-muted: #e8ece9;
+  --ax-surface-muted: #e4e9e6;
   --ax-ink: #1a2421;
   --ax-ink-secondary: #4a5c56;
   --ax-border: #c5cec9;
@@ -18,23 +18,25 @@
   --ax-accent-hover: #0a624c;
   --ax-accent-muted: #d4ede4;
   --ax-focus: #0e7a5f;
-  --ax-sidebar: 15.5rem;
+  --ax-sidebar: 16.5rem;
+  --ax-rail: #121816;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --ax-bg: #121816;
-    --ax-surface: #1c2420;
-    --ax-surface-muted: #151c19;
+    --ax-bg: #0e1311;
+    --ax-surface: #171e1b;
+    --ax-surface-muted: #121816;
     --ax-ink: #e6ede9;
     --ax-ink-secondary: #9aaba3;
-    --ax-border: #2e3a34;
+    --ax-border: #2a3530;
     --ax-border-strong: #4a5c54;
     --ax-accent: #3db892;
     --ax-accent-hover: #5cc9a6;
     --ax-accent-muted: #1a3d32;
     --ax-focus: #3db892;
+    --ax-rail: #0a0e0c;
   }
 }
 
@@ -52,16 +54,10 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--ax-font-body);
-  font-size: 1.05rem;
-  line-height: 1.6;
+  font-size: 1.0625rem;
+  line-height: 1.65;
   color: var(--ax-ink);
-  background:
-    radial-gradient(
-      70% 40% at 100% 0%,
-      color-mix(in srgb, var(--ax-accent-muted) 70%, transparent),
-      transparent 55%
-    ),
-    var(--ax-bg);
+  background: var(--ax-bg);
 }
 
 a {
@@ -79,7 +75,7 @@ button:focus-visible {
   left: 1rem;
   top: 1rem;
   z-index: 40;
-  padding: 0.4rem 0.75rem;
+  padding: 0.45rem 0.8rem;
   background: var(--ax-surface);
   border: 1px solid var(--ax-border-strong);
   border-radius: 4px;
@@ -95,38 +91,34 @@ button:focus-visible {
 .wiki-top {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem 1.25rem;
-  padding: 0.9rem 1.25rem;
+  gap: 0.75rem 1.5rem;
+  padding: 0.85rem 1.5rem;
   border-bottom: 1px solid var(--ax-border);
-  background: color-mix(in srgb, var(--ax-surface) 92%, transparent);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--ax-surface) 94%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 .brand {
   margin: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
   font-family: var(--ax-font-display);
   font-size: 1.2rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
-.brand::before {
-  content: "";
-  width: 0.95rem;
-  height: 0.95rem;
-  border: 2px solid var(--ax-accent);
-  border-radius: 2px;
-  background:
-    linear-gradient(90deg, var(--ax-accent) 0 2px, transparent 0) center / 100% 2px no-repeat,
-    linear-gradient(0deg, var(--ax-accent) 0 2px, transparent 0) center / 2px 100% no-repeat;
+.brand img {
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 5px;
+  display: block;
 }
 
 .brand a {
@@ -134,54 +126,66 @@ button:focus-visible {
   text-decoration: none;
 }
 
-.wiki-top-meta {
+.wiki-top-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.15rem;
   margin: 0;
-  color: var(--ax-ink-secondary);
-  font-size: 0.9rem;
+  padding: 0;
+  list-style: none;
 }
 
-.wiki-shell {
+.wiki-top-links a {
+  color: var(--ax-ink);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.wiki-top-links a:hover {
+  color: var(--ax-accent);
+}
+
+.wiki-frame {
   display: grid;
   grid-template-columns: 1fr;
-  width: min(100%, 72rem);
-  margin: 0 auto;
-  padding: 0 1rem 3rem;
-  gap: 0;
+  min-height: calc(100vh - 3.6rem);
 }
 
-@media (min-width: 960px) {
-  .wiki-shell {
+@media (min-width: 980px) {
+  .wiki-frame {
     grid-template-columns: var(--ax-sidebar) minmax(0, 1fr);
-    gap: 2rem;
-    padding: 0 1.5rem 4rem;
   }
 }
 
 .wiki-nav {
-  padding: 1.25rem 0 0;
+  background: var(--ax-surface);
+  border-bottom: 1px solid var(--ax-border);
+  padding: 1.1rem 1rem 1.4rem;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 980px) {
   .wiki-nav {
+    border-bottom: 0;
+    border-right: 1px solid var(--ax-border);
     position: sticky;
-    top: 4.25rem;
+    top: 3.55rem;
     align-self: start;
-    max-height: calc(100vh - 5rem);
+    height: calc(100vh - 3.55rem);
     overflow: auto;
-    padding-top: 1.75rem;
-    padding-bottom: 2rem;
+    padding: 1.6rem 1rem 2.5rem 1.35rem;
   }
 }
 
 .wiki-nav-group {
-  margin: 0 0 1.1rem;
+  margin: 0 0 1.35rem;
 }
 
 .wiki-nav-label {
-  margin: 0 0 0.4rem;
-  font-size: 0.72rem;
+  margin: 0 0 0.45rem 0.35rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ax-ink-secondary);
 }
@@ -191,22 +195,22 @@ button:focus-visible {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.15rem;
+  gap: 0.12rem;
 }
 
 .wiki-nav a {
   display: block;
-  padding: 0.35rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.42rem 0.65rem;
+  border-radius: 6px;
   color: var(--ax-ink);
   text-decoration: none;
   font-size: 0.92rem;
   font-weight: 500;
+  line-height: 1.35;
 }
 
 .wiki-nav a:hover {
   background: var(--ax-accent-muted);
-  color: var(--ax-ink);
 }
 
 .wiki-nav a[aria-current="page"] {
@@ -216,37 +220,65 @@ button:focus-visible {
   box-shadow: inset 3px 0 0 var(--ax-accent);
 }
 
-.wiki-main {
+.wiki-content {
   min-width: 0;
-  padding: 1.5rem 0 2rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ax-accent-muted) 35%, transparent),
+      transparent 14rem
+    ),
+    var(--ax-bg);
+}
+
+.wiki-main {
+  width: min(48rem, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+@media (min-width: 980px) {
+  .wiki-main {
+    padding: 2.5rem 2.5rem 5rem;
+  }
 }
 
 .wiki-hero {
-  margin: 0 0 2rem;
-  padding: 1.5rem 0 1.25rem;
+  margin: 0 0 2.25rem;
+  padding: 0.25rem 0 1.5rem;
   border-bottom: 1px solid var(--ax-border);
 }
 
-.wiki-hero-brand {
+.wiki-hero-kicker {
   margin: 0 0 0.65rem;
-  font-family: var(--ax-font-display);
-  font-size: clamp(2.4rem, 6vw, 3.5rem);
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.98;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ax-accent);
+}
+
+.wiki-hero-brand {
+  margin: 0 0 0.75rem;
+  font-family: var(--ax-font-display);
+  font-size: clamp(2.6rem, 6vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.96;
 }
 
 .wiki-hero-lead {
   margin: 0;
-  max-width: 62ch;
+  max-width: 40rem;
   color: var(--ax-ink-secondary);
-  font-size: 1.08rem;
+  font-size: 1.12rem;
+  line-height: 1.55;
 }
 
 .wiki-hero-rule {
-  width: 4.5rem;
+  width: 4.25rem;
   height: 3px;
-  margin: 1.15rem 0 0;
+  margin: 1.25rem 0 0;
   border: 0;
   background: var(--ax-accent);
 }
@@ -255,25 +287,25 @@ h1,
 h2,
 h3 {
   font-family: var(--ax-font-display);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.022em;
+  line-height: 1.18;
   color: var(--ax-ink);
 }
 
 h1 {
-  font-size: clamp(1.85rem, 3.5vw, 2.45rem);
-  margin: 0 0 1rem;
+  font-size: clamp(1.9rem, 3.4vw, 2.55rem);
+  margin: 0 0 0.9rem;
 }
 
 h2 {
-  font-size: 1.35rem;
-  margin: 2.4rem 0 0.75rem;
-  padding-top: 0.35rem;
+  font-size: 1.28rem;
+  margin: 2.6rem 0 0.7rem;
+  padding-top: 0.2rem;
 }
 
 h3 {
-  font-size: 1.08rem;
-  margin: 1.6rem 0 0.5rem;
+  font-size: 1.05rem;
+  margin: 1.7rem 0 0.45rem;
 }
 
 p,
@@ -284,43 +316,49 @@ li {
 p,
 ul,
 ol {
-  max-width: 68ch;
+  max-width: 42rem;
 }
 
 ul,
 ol {
-  padding-left: 1.25rem;
+  padding-left: 1.2rem;
 }
 
 li + li {
-  margin-top: 0.35rem;
+  margin-top: 0.4rem;
 }
 
 .lead {
-  font-size: 1.08rem;
+  font-size: 1.12rem;
   color: var(--ax-ink-secondary);
-  max-width: 68ch;
+  max-width: 42rem;
+  margin-top: 0;
 }
 
 .toc {
-  margin: 1.25rem 0 2rem;
-  padding: 1rem 1.1rem;
+  margin: 1.4rem 0 2rem;
+  padding: 1rem 1.15rem;
   border: 1px solid var(--ax-border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--ax-surface);
-  max-width: 40rem;
+  max-width: 28rem;
+  box-shadow: 0 1px 2px rgba(26, 36, 33, 0.05);
 }
 
 .toc p {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.45rem;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ax-ink-secondary);
 }
 
 .toc ol {
   margin: 0;
-  padding-left: 1.2rem;
+  padding-left: 1.15rem;
   max-width: none;
+  font-size: 0.95rem;
 }
 
 code,
@@ -329,22 +367,23 @@ pre {
 }
 
 code {
-  font-size: 0.9em;
+  font-size: 0.88em;
   background: var(--ax-surface);
   border: 1px solid var(--ax-border);
-  border-radius: 3px;
-  padding: 0.05em 0.3em;
+  border-radius: 4px;
+  padding: 0.08em 0.32em;
 }
 
 pre {
   overflow-x: auto;
   max-width: 100%;
-  padding: 0.9rem 1rem;
+  padding: 1rem 1.1rem;
   border: 1px solid var(--ax-border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--ax-surface);
-  font-size: 0.88rem;
-  line-height: 1.45;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(26, 36, 33, 0.05);
 }
 
 pre code {
@@ -358,13 +397,16 @@ table {
   border-collapse: collapse;
   background: var(--ax-surface);
   border: 1px solid var(--ax-border);
-  font-size: 0.95rem;
-  margin: 1rem 0 1.5rem;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.94rem;
+  margin: 1rem 0 1.6rem;
+  box-shadow: 0 1px 2px rgba(26, 36, 33, 0.05);
 }
 
 caption {
   text-align: left;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.85rem;
   color: var(--ax-ink-secondary);
   caption-side: top;
 }
@@ -373,7 +415,7 @@ th,
 td {
   text-align: left;
   vertical-align: top;
-  padding: 0.65rem 0.75rem;
+  padding: 0.7rem 0.85rem;
   border-top: 1px solid var(--ax-border);
 }
 
@@ -384,22 +426,23 @@ th {
 
 .card-list {
   list-style: none;
-  margin: 1rem 0 0;
+  margin: 1.1rem 0 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.7rem;
   max-width: none;
 }
 
 .card-list a {
   display: block;
-  padding: 0.95rem 1rem;
+  padding: 1rem 1.1rem;
   border: 1px solid var(--ax-border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--ax-surface);
   color: var(--ax-ink);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 650;
+  box-shadow: 0 1px 2px rgba(26, 36, 33, 0.05);
 }
 
 .card-list a:hover {
@@ -412,14 +455,16 @@ th {
   color: var(--ax-ink-secondary);
   font-size: 0.9rem;
   font-weight: 400;
+  line-height: 1.45;
 }
 
 .callout {
-  margin: 1.25rem 0;
-  padding: 0.9rem 1rem;
+  margin: 1.35rem 0;
+  padding: 1rem 1.1rem;
   border-left: 3px solid var(--ax-accent);
   background: var(--ax-accent-muted);
-  max-width: 68ch;
+  border-radius: 0 8px 8px 0;
+  max-width: 42rem;
 }
 
 .callout p {
@@ -431,30 +476,53 @@ th {
 }
 
 .wiki-footer {
-  width: min(100%, 72rem);
-  margin: 0 auto;
-  padding: 1rem 1.25rem 2.5rem;
   border-top: 1px solid var(--ax-border);
+  background: var(--ax-surface);
+  padding: 1.35rem 1.5rem 2rem;
   color: var(--ax-ink-secondary);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+}
+
+.wiki-footer-inner {
+  width: min(72rem, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.wiki-footer a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wiki-footer a:hover {
+  text-decoration: underline;
 }
 
 .wiki-pager {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 2.5rem;
-  padding-top: 1rem;
+  gap: 0.85rem;
+  margin-top: 3rem;
+  padding-top: 1.15rem;
   border-top: 1px solid var(--ax-border);
-  max-width: 68ch;
+  max-width: 42rem;
 }
 
 .wiki-pager a {
-  font-weight: 600;
+  font-weight: 650;
   text-decoration: none;
+  color: var(--ax-ink);
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--ax-border);
+  border-radius: 8px;
+  background: var(--ax-surface);
 }
 
 .wiki-pager a:hover {
-  text-decoration: underline;
+  border-color: var(--ax-accent);
+  color: var(--ax-accent);
 }

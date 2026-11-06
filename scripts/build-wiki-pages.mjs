@@ -64,29 +64,45 @@ const shell = ({ file, title, body, pager }) => `<!DOCTYPE html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title} -- AxiomChess Docs</title>
+  <meta name="description" content="AxiomChess product wiki: calibrated fair-play analysis for finished games. English only.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="wiki-top">
-    <p class="brand"><a href="index.html">AxiomChess</a></p>
-    <p class="wiki-top-meta">Product wiki · English only · No fabricated metrics</p>
+    <p class="brand">
+      <a href="index.html" aria-label="AxiomChess wiki home">
+        <img src="logo.svg" width="24" height="24" alt="">
+        AxiomChess
+      </a>
+    </p>
+    <ul class="wiki-top-links" aria-label="Quick links">
+      <li><a href="getting-started.html">Start</a></li>
+      <li><a href="api-overview.html">API</a></li>
+      <li><a href="methodology.html">Methodology</a></li>
+      <li><a href="https://github.com/AxiomChess">GitHub</a></li>
+    </ul>
   </header>
-  <div class="wiki-shell">
+  <div class="wiki-frame">
     <nav class="wiki-nav" aria-label="Wiki">
 ${navHtml(file)}
     </nav>
-    <main id="main-content" class="wiki-main" tabindex="-1">
+    <div class="wiki-content">
+      <main id="main-content" class="wiki-main" tabindex="-1">
 ${body}
 ${pager || ""}
-    </main>
+      </main>
+    </div>
   </div>
   <footer class="wiki-footer">
-    <p>MIT-licensed first-party docs. Sources: PROJECT_SPEC, calibration-v1, quotas, adapters manifest. <a href="index.html">Wiki home</a></p>
+    <div class="wiki-footer-inner">
+      <p>MIT first-party docs. Finished games only. Public-API-only. English only.</p>
+      <p><a href="index.html">Wiki home</a> · <a href="https://github.com/AxiomChess">GitHub org</a></p>
+    </div>
   </footer>
 </body>
 </html>
@@ -108,8 +124,9 @@ write(
   "Wiki home",
   `
 <div class="wiki-hero">
+  <p class="wiki-hero-kicker">Product wiki</p>
   <p class="wiki-hero-brand">AxiomChess</p>
-  <p class="wiki-hero-lead">Free and open-source chess fair-play analysis. Engine-backed reports with suspicion bands, uncertainty, and methodology notes -- never a raw accusation. This wiki is the long-form product reference for operators, integrators, and players.</p>
+  <p class="wiki-hero-lead">Free and open-source chess fair-play analysis for finished games. Engine-backed reports with suspicion bands, uncertainty, and methodology notes -- never a raw accusation. This wiki is the long-form reference for operators, integrators, and players.</p>
   <hr class="wiki-hero-rule" aria-hidden="true">
 </div>
 <h1>Product wiki</h1>
@@ -259,7 +276,7 @@ write(
 </ol></div>
 <h2 id="non-goals">Non-goals</h2>
 <ul>
-  <li>Live cheat detection during ongoing games.</li>
+  <li><strong>Live-game monitoring or live fair-play analysis.</strong> The API and adapters analyze finished public games or user-supplied PGN only. Live streams, ongoing games, and real-time move watching are out of scope and will not be added.</li>
   <li>Account takeover, credential stuffing, captcha bypass, or any private-game access.</li>
   <li>Scraping HTML behind login, circumventing rate limits, or violating site Terms of Service.</li>
   <li>Definitive guilt labels without uncertainty and methodology.</li>
@@ -267,6 +284,9 @@ write(
   <li>Social features as a primary product (comments, reputation scores, public shaming feeds).</li>
   <li>Guaranteeing legal findings for federations or platforms.</li>
 </ul>
+<div class="callout">
+  <p><strong>Finished games only.</strong> Requests that ask the product to watch or score a game still in progress are rejected by product policy. Use completed games via public URL, PGN, or username archives.</p>
+</div>
 <h2 id="sample">Sample-size and data limits</h2>
 <p>Reports become <code>inconclusive</code> when uncertainty half-width is greater than 0.20 or usable plies after book exclusion are fewer than 20. Missing clocks widen uncertainty relative to a clocked peer of similar length. Book-heavy openings reduce usable sample size by design.</p>
 <h2 id="legal">Legal and federation posture</h2>
